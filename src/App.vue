@@ -1,6 +1,9 @@
+<script setup>
+import Home from './components/Home.vue';
+</script>
+
 <template>
-  <LoginPage v-if="currentPage === 'login'" @change-page="goToPage" />
-  <SignupPage v-else-if="currentPage === 'signup'" @change-page="goToPage" />
+  <Home />
 </template>
 
 <script setup>
