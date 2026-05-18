@@ -5,7 +5,12 @@ import materialChair from '../assets/material-chair.png';
 import materialFrame from '../assets/material-frame.png';
 import materialPallets from '../assets/material-pallets.png';
 
-defineEmits(['change-page']);
+const emit = defineEmits(['change-page']);
+
+const handleMaterialClick = (material) => {
+  const page = material.tradeType === 'sale' ? 'material-detail' : 'material-rental-detail';
+  emit('change-page', page, material);
+};
 
 const navItems = [
   { label: '자재 마켓', page: 'marketplace', active: true, icon: 'M3 7h18M6 7V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2M5 7l1.2 12h11.6L19 7' },
@@ -199,7 +204,7 @@ const supportLinks = ['공지사항', 'FAQ', '문의하기'];
             :key="material.title"
             type="button"
             class="overflow-hidden rounded-[14px] border border-[#e5e7eb] bg-white text-left shadow-sm transition hover:-translate-y-1 hover:shadow-md"
-            @click="$emit('change-page', { tradeType: material.tradeType })"
+            @click="handleMaterialClick(material)"
           >
             <img :src="material.image" alt="" class="h-[258px] w-full object-cover" />
             <div class="p-5">
