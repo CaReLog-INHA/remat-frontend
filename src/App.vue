@@ -6,11 +6,22 @@ import LoginPage from './pages/LoginPage.vue';
 import MarketplacePage from './pages/MarketplacePage.vue';
 import RegisterMaterialPage from './pages/RegisterMaterialPage.vue';
 import SignupPage from './pages/SignupPage.vue';
+import MaterialDetailPage from './pages/MaterialDetailPage.vue';
+import MaterialRentalDetailPage from './pages/MaterialRentalDetailPage.vue';
 
 const currentPage = ref('home');
+const selectedProduct = ref(null);
 
-const goToPage = (target) => {
-  currentPage.value = target;
+const goToPage = (target, product = null) => {
+  if (typeof target === 'object') {
+    // target이 객체인 경우 (이전 호환성)
+    selectedProduct.value = target.product || null;
+    currentPage.value = target.page;
+  } else {
+    // target이 문자열인 경우
+    selectedProduct.value = product;
+    currentPage.value = target;
+  }
 };
 </script>
 
@@ -37,6 +48,18 @@ const goToPage = (target) => {
 
   <SignupPage
     v-else-if="currentPage === 'signup'"
+    @change-page="goToPage"
+  />
+
+  <MaterialDetailPage
+    v-else-if="currentPage === 'material-detail'"
+    :product="selectedProduct"
+    @change-page="goToPage"
+  />
+
+  <MaterialRentalDetailPage
+    v-else-if="currentPage === 'material-rental-detail'"
+    :product="selectedProduct"
     @change-page="goToPage"
   />
 </template>
