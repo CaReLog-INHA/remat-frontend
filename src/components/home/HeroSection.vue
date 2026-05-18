@@ -8,7 +8,7 @@ defineProps<{
 }>();
 
 defineEmits<{
-  (event: "change-page", pageName: "home" | "login" | "signup"): void;
+  (event: "change-page", pageName: "home" | "login" | "signup" | "register-material"): void;
 }>();
 </script>
 
@@ -39,7 +39,7 @@ defineEmits<{
           <button
             type="button"
             class="inline-flex h-10 items-center gap-2 rounded-[8px] border-2 border-white px-4 text-sm font-semibold text-white transition hover:bg-white/10"
-            @click="$emit('change-page', 'signup')"
+            @click="$emit('change-page', 'register-material')"
           >
             자재 등록하기
             <IconPath path="M5 12h14M13 5l7 7l-7 7" />
