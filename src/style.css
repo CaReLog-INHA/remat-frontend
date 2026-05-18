@@ -1,25 +1,15 @@
 @import "tailwindcss";
 
-:root {
-  --font-size: 16px;
-  --background: #fff6f6;
-  --foreground: #101828;
-  --primary: #030213;
-  --secondary: #334155;
-  --accent: #aa3bff;
-  --destructive: #dc2626;
-  --muted-foreground: #6b7280;
-  --input: #d1d5db;
-  --border: #e5e4e7;
-  --radius: 0.625rem;
+@theme {
+  --color-page-bg: #fff6f6;
+}
 
-  font-family: Inter, "Noto Sans KR", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: var(--foreground);
-  background: var(--background);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+:root {
+  --page-bg: #fff6f6;
+  --font-sans: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  color: #0f172a;
+  background: var(--page-bg);
+  font-family: var(--font-sans);
 }
 
 * {
@@ -31,33 +21,20 @@ html {
 }
 
 body {
-  min-width: 320px;
-  min-height: 100svh;
   margin: 0;
-  background: #fff6f6;
+  min-width: 320px;
+  padding: 0;
+  overflow-x: hidden;
+  background: var(--page-bg);
+  font-family: var(--font-sans);
 }
 
 button,
 a {
-  font: inherit;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-button {
-  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 #app {
-  min-height: 100svh;
-}
-
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
+  width: 100%;
+  min-height: 100vh;
 }
