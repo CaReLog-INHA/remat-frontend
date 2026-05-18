@@ -4,11 +4,11 @@ import RematLogo from "./RematLogo.vue";
 
 defineProps<{
   logoIconSrc: string;
-  navItems: Array<{ label: string; icon: string }>;
+  navItems: Array<{ label: string; icon: string; page?: "home" | "marketplace" | "signup" | "register-material" }>;
 }>();
 
 defineEmits<{
-  (event: "change-page", pageName: "home" | "login" | "signup"): void;
+  (event: "change-page", pageName: "home" | "login" | "signup" | "marketplace" | "register-material"): void;
 }>();
 </script>
 
@@ -20,15 +20,16 @@ defineEmits<{
       </button>
 
       <nav class="hidden items-center gap-1 lg:flex" aria-label="주요 메뉴">
-        <a
+        <button
           v-for="item in navItems"
           :key="item.label"
-          href="#materials"
+          type="button"
           class="flex h-9 items-center gap-2 rounded-[8px] px-4 text-sm text-[#364153] transition hover:bg-[#fff6f6] hover:text-[#2c687b]"
+          @click="item.page ? $emit('change-page', item.page) : undefined"
         >
           <IconPath :path="item.icon" />
           {{ item.label }}
-        </a>
+        </button>
       </nav>
 
       <div class="flex items-center gap-2">
