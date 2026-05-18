@@ -6,6 +6,10 @@ defineProps<{
   mascotSrc: string;
   stats: Array<{ value: string; label: string }>;
 }>();
+
+defineEmits<{
+  (event: "change-page", pageName: "home" | "login" | "signup"): void;
+}>();
 </script>
 
 <template>
@@ -20,22 +24,26 @@ defineProps<{
           ESG 기반 B2B 자재 플랫폼
         </p>
         <h1 class="max-w-2xl text-5xl font-extrabold leading-[1.05] tracking-normal sm:text-6xl">
-          자재를 재사용하고<br />
-          <span class="text-[#fff6f6]">미래를 만드세요</span>
+          자재를 다시 쓰고<br />
+          <span class="text-[#fff6f6]">미래를 만듭니다</span>
         </h1>
         <p class="mt-6 text-2xl text-white/90">ReMat: Re + Material</p>
         <p class="mt-4 max-w-2xl text-lg leading-8 text-white/80">
-          비출장 자재를 재사용하여 비용을 절감하고 탄소를 줄이는 지속 가능한 자재 거래 플랫폼
+          남는 자재를 필요한 곳에 연결해 비용을 줄이고 탄소 배출을 낮추는 자재 재사용 거래 플랫폼입니다.
         </p>
         <div class="mt-8 flex flex-wrap gap-4">
           <a href="#materials" class="inline-flex h-10 items-center gap-2 rounded-[8px] bg-white px-4 text-sm font-semibold text-[#2c687b] shadow-sm transition hover:bg-[#fff6f6]">
             <IconPath path="M3 7h18M6 7V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2M5 7l1.2 12h11.6L19 7" />
-            자재 찾아보기
+            자재 둘러보기
           </a>
-          <a href="#" class="inline-flex h-10 items-center gap-2 rounded-[8px] border-2 border-white px-4 text-sm font-semibold text-white transition hover:bg-white/10">
+          <button
+            type="button"
+            class="inline-flex h-10 items-center gap-2 rounded-[8px] border-2 border-white px-4 text-sm font-semibold text-white transition hover:bg-white/10"
+            @click="$emit('change-page', 'signup')"
+          >
             자재 등록하기
             <IconPath path="M5 12h14M13 5l7 7l-7 7" />
-          </a>
+          </button>
         </div>
 
         <dl class="mt-12 grid max-w-3xl grid-cols-3 border-t border-white/20 pt-10">
