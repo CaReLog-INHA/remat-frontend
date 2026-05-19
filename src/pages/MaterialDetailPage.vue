@@ -36,6 +36,13 @@ const decrementQuantity = () => {
   }
 };
 
+const navItems = [
+  { label: '자재 마켓', page: 'marketplace', icon: 'M3 7h18M6 7V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2M5 7l1.2 12h11.6L19 7' },
+  { label: 'AI 분석', icon: 'M12 3v3M12 18v3M5.64 5.64l2.12 2.12M16.24 16.24l2.12 2.12M3 12h3M18 12h3M9 12a3 3 0 1 0 6 0a3 3 0 0 0-6 0' },
+  { label: '자재 등록', page: 'register-material', icon: 'M12 5v14M5 12h14' },
+  { label: '거래현황', icon: 'M4 19V5M8 17v-6M12 17V7M16 17v-3M20 19H4' },
+];
+
 // Asset URLs from Figma
 const assets = {
   backIcon: "http://localhost:3845/assets/9a8770fdd4ae98648115cd4a5c0c533f14872709.svg",
@@ -53,39 +60,63 @@ const assets = {
 <template>
   <div class="bg-[#fff6f6] flex flex-col min-h-screen">
     <!-- Header -->
-    <div class="bg-white border-b border-[#e5e7eb] sticky top-0 z-10">
-      <div class="max-w-[1443px] mx-auto px-[81.5px] py-[16px]">
-        <div class="flex items-center justify-between">
+    <header class="sticky top-0 z-50 border-b border-[#e5e7eb] bg-white shadow-sm">
+      <div class="mx-auto flex h-16 max-w-[1443px] items-center justify-between px-5 sm:px-8 lg:px-20">
+        <button
+          type="button"
+          class="flex items-center gap-2 rounded-[10px] px-3 py-2 text-[#4a5565] transition hover:bg-[#fff6f6]"
+          @click="goBack"
+        >
+          <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <span class="text-[16px] font-medium">뒤로 가기</span>
+        </button>
+
+        <nav class="hidden items-center gap-2 lg:flex" aria-label="주요 메뉴">
           <button
-            @click="goBack"
-            class="flex items-center gap-[8px] h-[24px] text-[#4a5565] hover:opacity-70 transition"
+            v-for="item in navItems"
+            :key="item.label"
+            type="button"
+            :class="[
+              'inline-flex h-9 items-center gap-2 rounded-[10px] px-4 text-sm transition',
+              'text-[#364153] hover:bg-[#fff6f6]',
+            ]"
+            @click="item.page ? $emit('change-page', item.page) : undefined"
           >
-            <img :src="assets.backIcon" alt="뒤로가기" class="w-[20px] h-[20px]" />
-            <span class="font-medium text-[16px] tracking-[-0.3125px]">뒤로 가기</span>
+            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path :d="item.icon" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            {{ item.label }}
           </button>
-          
-          <!-- Product Info Badge -->
-          <div class="flex gap-[8px]">
-            <div class="bg-[rgba(140,199,196,0.2)] text-[#2c687b] px-[12px] py-[6px] rounded-[10px] font-medium text-[12px]">
-              {{ product.category }}
-            </div>
-            <div class="bg-[#f0fdf4] text-[#008236] px-[12px] py-[6px] rounded-[10px] font-medium text-[12px]">
-              {{ product.condition }}
-            </div>
-            <div class="bg-[#dbeafe] text-[#1447e6] px-[12px] py-[6px] rounded-[10px] font-medium text-[12px] flex items-center gap-[6px]">
-              <img :src="assets.saleIcon" alt="판매" class="w-[14px] h-[14px]" />
-              판매
-            </div>
-          </div>
+        </nav>
+
+        <div class="flex items-center gap-3">
+          <button
+            type="button"
+            class="hidden h-8 items-center gap-2 rounded-[8px] border border-black/10 bg-[#fff6f6] px-3 text-sm font-medium text-[#1a1a1a] sm:inline-flex"
+          >
+            <svg class="size-4 text-[#2c687b]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21a8 8 0 0 0-16 0M12 13a5 5 0 1 0 0-10a5 5 0 0 0 0 10" stroke-linecap="round" />
+            </svg>
+            마이페이지
+          </button>
+          <button
+            type="button"
+            class="h-8 rounded-[8px] border border-black/10 bg-[#fff6f6] px-3 text-sm font-medium text-[#1a1a1a]"
+            @click="$emit('change-page', 'login')"
+          >
+            로그아웃
+          </button>
         </div>
       </div>
-    </div>
+    </header>
 
     <!-- Main Content -->
-    <div class="flex-1 max-w-[1443px] mx-auto w-full px-[113.5px] py-[24px]">
-      <div class="flex gap-[24px]">
+    <div class="flex-1 max-w-[1443px] mx-auto w-full px-5 py-8 sm:px-8 lg:px-20">
+      <div class="grid gap-6 lg:grid-cols-[1fr_384px]">
         <!-- Left Column - Product Info -->
-        <div class="flex-1 max-w-[800px]">
+        <div class="space-y-6">
           <!-- Product Image -->
           <div class="bg-white rounded-[14px] shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)] overflow-hidden mb-[24px]">
             <div class="bg-[#f3f4f6] w-full h-[500px]">
@@ -190,7 +221,7 @@ const assets = {
         </div>
 
         <!-- Right Column - Seller & Transaction -->
-        <div class="w-[384px]">
+        <div class="space-y-6">
           <!-- Seller Info -->
           <div class="bg-white rounded-[14px] shadow-[0px_1px_1.5px_rgba(0,0,0,0.1),0px_1px_1px_rgba(0,0,0,0.1)] p-[24px] mb-[24px]">
             <h3 class="text-[18px] font-bold text-[#101828] mb-[16px] tracking-[-0.4395px]">판매자 정보</h3>
