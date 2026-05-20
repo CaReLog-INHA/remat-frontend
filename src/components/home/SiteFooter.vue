@@ -22,7 +22,7 @@ defineProps<{
             <RematLogo :icon-src="logoIconSrc" variant="footer" />
           </div>
           <p class="mt-5 text-base text-white/75">ESG 기반 자재 재사용 플랫폼</p>
-          <p class="mt-3 max-w-md text-sm leading-6 text-white/55">비출장 자재를 순환하고, 탄소를 절감하며, 비용을 절약하세요.</p>
+          <p class="mt-3 max-w-md text-sm leading-6 text-white/55">버려질 자재를 순환시키고, 탄소를 절감하며, 조달 비용까지 낮출 수 있도록 돕습니다.</p>
         </div>
         <div>
           <h3 class="text-lg font-bold">서비스</h3>

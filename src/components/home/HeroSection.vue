@@ -21,15 +21,15 @@ defineEmits<{
     <div class="mx-auto grid min-h-[720px] max-w-7xl items-center gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[1fr_360px] lg:px-8">
       <div class="max-w-3xl">
         <p class="mb-6 inline-flex rounded-full bg-white/15 px-4 py-2 text-sm text-white ring-1 ring-white/15">
-          ESG 기반 B2B 자재 플랫폼
+          ESG 기반 B2B 자재 재사용 플랫폼
         </p>
         <h1 class="max-w-2xl text-5xl font-extrabold leading-[1.05] tracking-normal sm:text-6xl">
-          자재를 다시 쓰고<br />
-          <span class="text-[#fff6f6]">미래를 만듭니다</span>
+          자재를 다시 잇고<br />
+          <span class="text-[#fff6f6]">지속가능한 미래를 만듭니다</span>
         </h1>
         <p class="mt-6 text-2xl text-white/90">ReMat: Re + Material</p>
         <p class="mt-4 max-w-2xl text-lg leading-8 text-white/80">
-          남는 자재를 필요한 곳에 연결해 비용을 줄이고 탄소 배출을 낮추는 자재 재사용 거래 플랫폼입니다.
+          남는 자재를 필요한 곳에 연결해 조달 비용을 낮추고 탄소 배출을 줄이는 순환형 자재 거래 플랫폼입니다.
         </p>
         <div class="mt-8 flex flex-wrap gap-4">
           <a href="#materials" class="inline-flex h-10 items-center gap-2 rounded-[8px] bg-white px-4 text-sm font-semibold text-[#2c687b] shadow-sm transition hover:bg-[#fff6f6]">
