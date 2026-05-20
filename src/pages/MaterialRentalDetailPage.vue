@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-<script setup>
-import { computed } from 'vue';
-import RentalForm from '../components/RentalForm.vue';
-import mascotSrc from '../assets/figma-mascot-original.svg';
-import logoIconSrc from '../assets/figma-logo-icon-original.svg';
+import { computed, ref } from 'vue';
+import SiteHeader from "@/components/home/SiteHeader.vue";
+import SiteFooter from "@/components/home/SiteFooter.vue";
+import { footerLinks, homeAssets } from '@/data/home';
 
 const props = defineProps({
   product: {
@@ -13,453 +11,102 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["change-page"]);
+const emit = defineEmits(['change-page']);
 
 const quantity = ref(1);
-const startDate = ref("");
-const endDate = ref("");
-const message = ref("");
+const startDate = ref('');
+const endDate = ref('');
 
 const material = computed(() => props.product ?? {
-  image: "",
-  category: "가구",
-  condition: "최상",
-  title: "행사용 접이식 의자",
-  desc: "행사 현장에서 사용한 접이식 의자입니다. 가볍고 적재가 쉬워 단기 프로젝트에 적합합니다.",
-  location: "서울 마포구",
+  image: 'https://via.placeholder.com/800x600?text=No+Image',
+  title: '행사용 접이식 의자',
   price: 25000,
-  priceLabel: "25,000원",
+  priceLabel: '25,000원',
   stock: 150,
-  stockLabel: "150개 보유",
-  carbon: "45kg CO2",
-  seller: "이벤트플러스",
-  rating: "4.9",
-  registeredAt: "2026-04-04",
+  stockLabel: '150개 보유',
+  location: '서울 마포구',
+  registeredAt: '2026-04-04',
+  description: '행사용 접이식 의자입니다. 상태 양호.',
 });
 
 const rentalDays = computed(() => {
   if (!startDate.value || !endDate.value) return 1;
-  const start = new Date(startDate.value);
-  const end = new Date(endDate.value);
-  const diff = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+  const s = new Date(startDate.value);
+  const e = new Date(endDate.value);
+  const diff = Math.ceil((e.getTime() - s.getTime()) / (1000 * 60 * 60 * 24));
   return Math.max(1, diff + 1);
 });
 
-const estimatedPrice = computed(() => `${((material.value.price ?? 25000) * quantity.value * rentalDays.value).toLocaleString()}원`);
-const estimatedCarbon = computed(() => `${(45 * quantity.value * rentalDays.value / 10).toFixed(1)}kg CO2`);
+const estimatedPrice = computed(() => `${(material.value.price * quantity.value * rentalDays.value).toLocaleString()}원`);
+
+const goBack = () => emit('change-page', 'marketplace');
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#fff6f6]">
-    <header class="sticky top-0 z-20 border-b border-[#e5e7eb] bg-white/95 backdrop-blur">
-      <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <button type="button" class="inline-flex items-center gap-2 text-sm font-medium text-[#4a5565]" @click="$emit('change-page', 'marketplace')">
+  <div class="min-h-screen bg-[#fff6f6] text-[#101828]">
+    <SiteHeader :logo-icon-src="homeAssets.logoIcon" :nav-items="[]" account-variant="member" @change-page="$emit('change-page', $event)" />
+
+    <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <header class="mb-6">
+        <button class="inline-flex items-center gap-2 text-sm text-[#4a5565]" @click="goBack">
           <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="m15 18-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
           목록으로 돌아가기
         </button>
-        <div class="flex gap-2">
-          <span class="rounded-[10px] bg-[#8cc7c4]/20 px-3 py-1 text-xs font-semibold text-[#2c687b]">{{ material.category }}</span>
-          <span class="rounded-[10px] bg-[#f0fdf4] px-3 py-1 text-xs font-semibold text-[#008236]">{{ material.condition }}</span>
-          <span class="rounded-[10px] bg-[#f3e8ff] px-3 py-1 text-xs font-semibold text-[#8200db]">대여</span>
-    default: null,
-  },
-});
+      </header>
 
-const emit = defineEmits(['change-page']);
-
-// 상품 정보 (props에서 받거나 기본값 사용)
-const material = computed(() => {
-  const defaultMaterial = {
-    id: 1,
-    name: '행사용 접이식 의자',
-    price: 25000,
-    unit: '개/일',
-    category: '가구',
-    condition: '최상',
-    image: 'https://via.placeholder.com/600x500?text=Event+Chair',
-    stock: 150,
-    location: '서울 마포구',
-    registeredDate: '2026-04-04',
-    description: '컨퍼런스에서 2회 사용한 접이식 의자입니다. 가벼운 플라스틱 소재로 이동과 보관이 편리합니다. 청소 완료 상태로 즉시 사용 가능합니다.',
-    carbonReduction: 45,
-    seller: {
-      name: '이벤트플러스',
-      rating: 4.9,
-      reviews: 128,
-    },
-  };
-
-  if (!props.product) {
-    return defaultMaterial;
-  }
-  
-  return {
-    id: props.product.id || 1,
-    name: props.product.title || '상품명',
-    price: typeof props.product.price === 'string' 
-      ? parseInt(props.product.price.replace(/[^0-9]/g, '')) 
-      : props.product.price || 0,
-    unit: props.product.unit || '개/일',
-    category: props.product.category || '기타',
-    condition: props.product.condition || '중고',
-    image: props.product.image || 'https://via.placeholder.com/600x500?text=No+Image',
-    stock: typeof props.product.stock === 'string'
-      ? parseInt(props.product.stock.replace(/[^0-9]/g, ''))
-      : props.product.stock || 1,
-    location: props.product.location || '지역 미지정',
-    registeredDate: props.product.registeredDate || new Date().toISOString().split('T')[0],
-    description: props.product.desc || props.product.description || '상품 설명이 없습니다.',
-    carbonReduction: typeof props.product.carbon === 'string'
-      ? parseInt(props.product.carbon.replace(/[^0-9]/g, ''))
-      : props.product.carbon || 0,
-    seller: props.product.seller || {
-      name: '판매자',
-      rating: 4.5,
-      reviews: 0,
-    },
-  };
-});
-
-const navItems = [
-  { label: '자재 마켓', page: 'marketplace', icon: 'M3 7h18M6 7V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2M5 7l1.2 12h11.6L19 7' },
-  { label: 'AI 분석', icon: 'M12 3v3M12 18v3M5.64 5.64l2.12 2.12M16.24 16.24l2.12 2.12M3 12h3M18 12h3M9 12a3 3 0 1 0 6 0a3 3 0 0 0-6 0' },
-  { label: '자재 등록', page: 'register-material', icon: 'M12 5v14M5 12h14' },
-  { label: '거래현황', icon: 'M4 19V5M8 17v-6M12 17V7M16 17v-3M20 19H4' },
-];
-
-const serviceLinks = ['자재 마켓', 'AI 분석', '자재 등록', '대시보드'];
-const supportLinks = ['공지사항', 'FAQ', '문의하기'];
-
-const goBack = () => {
-  emit('change-page', 'marketplace');
-};
-</script>
-
-<template>
-  <div class="min-h-screen bg-[#fff6f6] text-[#101828]">
-    <!-- Header -->
-    <header class="sticky top-0 z-50 border-b border-[#e5e7eb] bg-white shadow-sm">
-      <div class="mx-auto flex h-16 max-w-[1443px] items-center justify-between px-5 sm:px-8 lg:px-20">
-        <button
-          type="button"
-          class="flex items-center gap-2 rounded-[10px] px-3 py-2 text-[#4a5565] transition hover:bg-[#fff6f6]"
-          @click="goBack"
-        >
-          <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-          <span class="text-[16px] font-medium">뒤로 가기</span>
-        </button>
-
-        <nav class="hidden items-center gap-2 lg:flex" aria-label="주요 메뉴">
-          <button
-            v-for="item in navItems"
-            :key="item.label"
-            type="button"
-            :class="[
-              'inline-flex h-9 items-center gap-2 rounded-[10px] px-4 text-sm transition',
-              'text-[#364153] hover:bg-[#fff6f6]',
-            ]"
-            @click="item.page ? $emit('change-page', item.page) : undefined"
-          >
-            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path :d="item.icon" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            {{ item.label }}
-          </button>
-        </nav>
-
-        <div class="flex items-center gap-3">
-          <button
-            type="button"
-            class="hidden h-8 items-center gap-2 rounded-[8px] border border-black/10 bg-[#fff6f6] px-3 text-sm font-medium text-[#1a1a1a] sm:inline-flex"
-          >
-            <svg class="size-4 text-[#2c687b]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20 21a8 8 0 0 0-16 0M12 13a5 5 0 1 0 0-10a5 5 0 0 0 0 10" stroke-linecap="round" />
-            </svg>
-            마이페이지
-          </button>
-          <button
-            type="button"
-            class="h-8 rounded-[8px] border border-black/10 bg-[#fff6f6] px-3 text-sm font-medium text-[#1a1a1a]"
-            @click="$emit('change-page', 'login')"
-          >
-            로그아웃
-          </button>
-        </div>
-      </div>
-    </header>
-
-    <main class="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(0,1fr)_400px] lg:px-8">
-      <section class="space-y-6">
-        <div class="overflow-hidden rounded-[20px] border border-[#e5e7eb] bg-white shadow-sm">
-          <img :src="material.image" alt="" class="h-[440px] w-full object-cover" />
-        </div>
-
-        <article class="rounded-[20px] border border-[#e5e7eb] bg-white p-6 shadow-sm">
-          <h1 class="text-[32px] font-bold tracking-[-0.03em] text-[#101828]">{{ material.title }}</h1>
-          <div class="mt-3 flex items-end gap-2">
-            <span class="text-[34px] font-bold text-[#db1a1a]">{{ material.priceLabel }}</span>
-            <span class="pb-1 text-sm text-[#6a7282]">/ 1일 기준</span>
+      <div class="grid gap-6 lg:grid-cols-[1fr_360px]">
+        <section class="space-y-6">
+          <div class="overflow-hidden rounded-[20px] border border-[#e5e7eb] bg-white shadow-sm">
+            <img :src="material.image" alt="" class="h-[440px] w-full object-cover" />
           </div>
 
-          <div class="mt-6 grid gap-4 rounded-[16px] bg-[#f9fafb] p-5 sm:grid-cols-3">
-            <div>
-              <p class="text-xs text-[#6a7282]">보유 수량</p>
-              <p class="mt-1 text-base font-semibold text-[#101828]">{{ material.stockLabel }}</p>
+          <article class="rounded-[20px] border border-[#e5e7eb] bg-white p-6 shadow-sm">
+            <h1 class="text-[32px] font-bold">{{ material.title }}</h1>
+            <p class="mt-4 text-sm text-[#4a5565]">{{ material.description }}</p>
+            <div class="mt-6 flex items-end gap-2">
+              <span class="text-[28px] font-bold text-[#db1a1a]">{{ material.priceLabel }}</span>
+              <span class="pb-1 text-sm text-[#6a7282]">/ 1일</span>
             </div>
-            <div>
-              <p class="text-xs text-[#6a7282]">위치</p>
-              <p class="mt-1 text-base font-semibold text-[#101828]">{{ material.location }}</p>
-            </div>
-            <div>
-              <p class="text-xs text-[#6a7282]">등록일</p>
-              <p class="mt-1 text-base font-semibold text-[#101828]">{{ material.registeredAt }}</p>
-            </div>
-          </div>
+          </article>
+        </section>
 
-          <div class="mt-8">
-            <h2 class="text-xl font-bold text-[#101828]">상세 설명</h2>
-            <p class="mt-3 text-base leading-7 text-[#364153]">{{ material.desc }}</p>
-          </div>
-        </article>
-      </section>
-
-      <aside class="space-y-6">
-        <article class="rounded-[20px] border border-[#e5e7eb] bg-white p-6 shadow-sm">
-          <h2 class="text-lg font-bold text-[#101828]">대여 요청</h2>
-
-          <div class="mt-5">
-            <label class="text-sm font-medium text-[#364153]">수량 선택</label>
-            <div class="mt-2 flex items-center gap-3">
-              <button type="button" class="grid size-10 place-items-center rounded-xl border border-black/10 bg-[#fff6f6]" :disabled="quantity <= 1" @click="quantity = Math.max(1, quantity - 1)">-</button>
-              <input v-model.number="quantity" type="number" min="1" class="h-11 flex-1 rounded-xl border border-[#d1d5dc] bg-white px-4 text-center text-sm font-semibold outline-none focus:border-[#8cc7c4]" />
-              <button type="button" class="grid size-10 place-items-center rounded-xl border border-black/10 bg-[#fff6f6]" @click="quantity += 1">+</button>
+        <aside class="space-y-6">
+          <div class="rounded-[16px] border border-[#e5e7eb] bg-white p-6 shadow-sm">
+            <p class="text-sm text-[#4a5565]">대여 수량</p>
+            <div class="mt-3 flex items-center gap-3">
+              <button class="h-9 w-9 rounded-md bg-[#f3f4f6]" @click="quantity > 1 ? quantity-- : null">-</button>
+              <span class="text-lg font-medium">{{ quantity }}</span>
+              <button class="h-9 w-9 rounded-md bg-[#f3f4f6]" @click="quantity++">+</button>
             </div>
-          </div>
 
-          <div class="mt-5 grid gap-4 sm:grid-cols-2">
-            <div>
-              <label class="text-sm font-medium text-[#364153]">시작일</label>
-              <input v-model="startDate" type="date" class="mt-2 h-11 w-full rounded-xl border border-[#d1d5dc] bg-white px-4 text-sm outline-none focus:border-[#8cc7c4]" />
-            </div>
-            <div>
-              <label class="text-sm font-medium text-[#364153]">종료일</label>
-              <input v-model="endDate" type="date" class="mt-2 h-11 w-full rounded-xl border border-[#d1d5dc] bg-white px-4 text-sm outline-none focus:border-[#8cc7c4]" />
-            </div>
-          </div>
-
-          <div class="mt-5 rounded-[16px] bg-[#f9fafb] p-4">
-            <div class="flex items-center justify-between text-sm text-[#4a5565]">
-              <span>예상 기간</span>
-              <span>{{ rentalDays }}일</span>
-            </div>
-            <div class="mt-3 flex items-center justify-between">
-              <span class="text-sm text-[#4a5565]">예상 금액</span>
-              <span class="text-2xl font-bold text-[#db1a1a]">{{ estimatedPrice }}</span>
-            </div>
-            <div class="mt-2 flex items-center justify-between text-sm">
-              <span class="text-[#4a5565]">예상 탄소 절감</span>
-              <span class="font-semibold text-[#00a63e]">{{ estimatedCarbon }}</span>
-            </div>
-          </div>
-
-          <div class="mt-5">
-            <label class="text-sm font-medium text-[#364153]">요청 메시지</label>
-            <textarea
-              v-model="message"
-              placeholder="납품 일정, 설치 지원 여부, 추가 요청사항을 남겨주세요."
-              class="mt-2 min-h-[120px] w-full resize-none rounded-xl border border-[#d1d5dc] bg-white px-4 py-3 text-sm outline-none focus:border-[#8cc7c4]"
-            ></textarea>
-          </div>
-
-          <div class="mt-5 space-y-3">
-            <button type="button" class="flex h-12 w-full items-center justify-center rounded-xl bg-[#db1a1a] text-sm font-semibold text-white">대여 요청하기</button>
-            <p class="text-center text-xs text-[#6a7282]">판매자 확인 후 상세 거래 조건을 조율할 수 있습니다.</p>
-          </div>
-        </article>
-
-        <article class="rounded-[20px] border border-[#b9f8cf] bg-[linear-gradient(135deg,#f0fdf4_0%,#effdf6_100%)] p-5 shadow-sm">
-          <h3 class="text-sm font-bold text-[#2c687b]">안전 거래 안내</h3>
-          <ul class="mt-3 space-y-2 text-sm text-[#4a5565]">
-            <li>검수된 판매자와 거래할 수 있습니다.</li>
-            <li>대여 기간과 상태 조건을 사전 협의할 수 있습니다.</li>
-            <li>반납 일정과 운송 방식은 메시지로 조율 가능합니다.</li>
-          </ul>
-        </article>
-      </aside>
-    </main>
-  </div>
-</template>
-    <!-- Main Content -->
-    <main class="mx-auto max-w-[1443px] px-5 py-8 sm:px-8 lg:px-20">
-      <div class="grid gap-6 lg:grid-cols-[1fr_384px]">
-        <!-- Left Column -->
-        <div class="space-y-6">
-          <!-- Product Image -->
-          <div class="overflow-hidden rounded-[14px] bg-white shadow-sm">
-            <div class="relative h-[500px] w-full bg-[#f3f4f6]">
-              <img
-                :src="material.image"
-                :alt="material.name"
-                class="h-full w-full object-cover"
-              />
-            </div>
-          </div>
-
-          <!-- Product Info -->
-          <div class="rounded-[14px] bg-white p-6 shadow-sm">
-            <!-- Badges -->
-            <div class="mb-6 flex flex-wrap gap-2">
-              <div class="rounded-[10px] bg-[rgba(140,199,196,0.2)] px-3 py-2">
-                <p class="text-[14px] font-medium text-[#2c687b]">{{ material.category }}</p>
-              </div>
-              <div class="rounded-[10px] bg-[#f0fdf4] px-3 py-2">
-                <p class="text-[14px] font-medium text-[#008236]">{{ material.condition }}</p>
-              </div>
-              <div class="flex items-center gap-2 rounded-[10px] bg-[#f3e8ff] px-3 py-2">
-                <svg class="size-4 text-[#8200db]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M12 2v20M2 12h20" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-                <p class="text-[14px] font-medium text-[#8200db]">대여</p>
+            <div class="mt-4">
+              <p class="text-sm text-[#4a5565]">대여 기간</p>
+              <div class="mt-2 flex gap-2">
+                <input type="date" v-model="startDate" class="h-9 rounded-md border px-2" />
+                <input type="date" v-model="endDate" class="h-9 rounded-md border px-2" />
               </div>
             </div>
 
-            <!-- Product Name -->
-            <h1 class="mb-4 text-[30px] font-bold text-[#101828]">{{ material.name }}</h1>
-
-            <!-- Price -->
-            <div class="mb-8 flex items-baseline gap-2">
-              <p class="text-[36px] font-bold text-[#db1a1a]">{{ material.price.toLocaleString() }}원</p>
-              <p class="text-[18px] text-[#4a5565]">/ {{ material.unit }}</p>
+            <div class="mt-6">
+              <p class="text-sm text-[#4a5565]">예상 요금</p>
+              <p class="mt-2 text-lg font-semibold">{{ estimatedPrice }}</p>
             </div>
 
-            <!-- Info Grid -->
-            <div class="mb-8 rounded-[10px] bg-[#f9fafb] p-4">
-              <div class="grid gap-4 md:grid-cols-3">
-                <div class="flex items-start gap-3">
-                  <svg class="mt-1 size-5 text-[#4a5565]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2v20M2 12h20" stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                  <div>
-                    <p class="text-xs text-[#6a7282]">재고</p>
-                    <p class="text-[16px] font-medium text-[#1a1a1a]">{{ material.stock }}개</p>
-                  </div>
-                </div>
-                <div class="flex items-start gap-3">
-                  <svg class="mt-1 size-5 text-[#4a5565]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2v20M2 12h20" stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                  <div>
-                    <p class="text-xs text-[#6a7282]">위치</p>
-                    <p class="text-[16px] font-medium text-[#1a1a1a]">{{ material.location }}</p>
-                  </div>
-                </div>
-                <div class="flex items-start gap-3">
-                  <svg class="mt-1 size-5 text-[#4a5565]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2v20M2 12h20" stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                  <div>
-                    <p class="text-xs text-[#6a7282]">등록일</p>
-                    <p class="text-[16px] font-medium text-[#1a1a1a]">{{ material.registeredDate }}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Description -->
-            <div class="mb-8 border-t border-[#e5e7eb] pt-6">
-              <h2 class="mb-4 text-[20px] font-bold text-[#101828]">상세 설명</h2>
-              <p class="text-[16px] leading-[26px] text-[#364153]">{{ material.description }}</p>
-            </div>
-
-            <!-- ESG Effect -->
-            <div class="border-t border-[#e5e7eb] pt-6">
-              <h2 class="mb-4 text-[20px] font-bold text-[#101828]">ESG 효과</h2>
-              <div class="rounded-[10px] border border-[#b9f8cf] bg-[#f0fdf4] p-4">
-                <div class="flex items-start gap-3 pb-4">
-                  <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[10px] bg-[#dcfce7]">
-                    <svg class="size-5 text-[#008236]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M20 16c-6 2-12-1-16-8c6-2 12 1 16 8ZM4 8c0 7 5 11 12 11" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="text-[14px] text-[#4a5565]">탄소 절감량</p>
-                    <p class="mt-1 text-[24px] font-bold text-[#008236]">{{ material.carbonReduction }}kg CO₂</p>
-                  </div>
-                </div>
-                <p class="text-xs text-[#4a5565]">신규 자재 대비 탄소 배출 감소</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right Column -->
-        <div class="space-y-6">
-          <!-- Seller Info -->
-          <div class="rounded-[14px] bg-white p-6 shadow-sm">
-            <h3 class="mb-4 text-[18px] font-bold text-[#101828]">판매자 정보</h3>
-            <div class="flex items-start gap-3">
-              <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-[rgba(140,199,196,0.2)]">
-                <p class="text-[16px] font-bold text-[#2c687b]">이</p>
-              </div>
-              <div>
-                <h4 class="text-[16px] font-bold text-[#101828]">{{ material.seller.name }}</h4>
-                <div class="mt-1 flex items-center gap-1">
-                  <svg class="size-4 text-[#fbbf24]" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                  </svg>
-                  <span class="text-[14px] font-medium text-[#4a5565]">{{ material.seller.rating }}</span>
-                  <span class="text-[14px] text-[#99a1af]">({{ material.seller.reviews }})</span>
-                </div>
-              </div>
+            <div class="mt-6">
+              <button class="w-full rounded-xl bg-[#2c687b] px-4 py-3 text-white">대여 요청하기</button>
             </div>
           </div>
 
-          <!-- Rental Form -->
-          <RentalForm />
-        </div>
+          <div class="rounded-[16px] border border-[#e5e7eb] bg-white p-6 shadow-sm">
+            <p class="text-sm text-[#4a5565]">판매자</p>
+            <p class="mt-2 text-lg font-semibold">이벤트플러스</p>
+          </div>
+        </aside>
       </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="relative mt-12 overflow-hidden bg-[#2c687b] py-12 text-white">
-      <img :src="mascotSrc" alt="" class="pointer-events-none absolute bottom-8 right-16 size-[200px] opacity-5" />
-      <div class="mx-auto max-w-[1443px] px-5 sm:px-8 lg:px-20">
-        <div class="grid gap-10 md:grid-cols-[1fr_280px_280px]">
-          <div>
-            <div class="flex items-center gap-3">
-              <img :src="mascotSrc" alt="" class="size-10 object-contain" />
-              <div>
-                <strong class="block text-xl font-bold">ReMat</strong>
-                <span class="text-[10px] tracking-[0.16em] text-[#99a1af]">Re + Material</span>
-              </div>
-            </div>
-            <p class="mt-5 text-base text-white/75">ESG 기반 자재 재사용 플랫폼</p>
-            <p class="mt-3 max-w-md text-sm leading-6 text-white/55">비출장 자재를 순환하고, 탄소를 절감하며, 비용을 절약하세요.</p>
-          </div>
-          <div>
-            <h3 class="text-lg font-bold">서비스</h3>
-            <ul class="mt-4 space-y-2 text-sm text-white/75">
-              <li v-for="link in serviceLinks" :key="link">{{ link }}</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="text-lg font-bold">고객지원</h3>
-            <ul class="mt-4 space-y-2 text-sm text-white/75">
-              <li v-for="link in supportLinks" :key="link">{{ link }}</li>
-            </ul>
-          </div>
-        </div>
-        <p class="mt-10 border-t border-white/10 pt-8 text-center text-sm text-[#99a1af]">© 2026 ReMat. All rights reserved.</p>
-      </div>
-    </footer>
+    <SiteFooter :logo-icon-src="homeAssets.logoIcon" :mascot-src="homeAssets.mascot" :service-links="footerLinks.service" :support-links="footerLinks.support" />
   </div>
 </template>
-
-<style scoped>
-/* Tailwind CSS already handles styling */
-</style>
-

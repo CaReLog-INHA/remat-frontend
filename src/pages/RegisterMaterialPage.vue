@@ -1,16 +1,14 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import SiteFooter from "@/components/home/SiteFooter.vue";
 import SiteHeader from "@/components/home/SiteHeader.vue";
-import { footerLinks, homeAssets, navItems } from "@/data/home";
-<script setup>
-import { ref } from 'vue';
-import mascotSrc from '../assets/figma-mascot-original.svg';
-import logoIconSrc from '../assets/figma-logo-icon-original.svg';
-import RentalForm from '../components/RentalForm.vue';
+import RentalForm from '@/components/RentalForm.vue';
+import { footerLinks, homeAssets } from "@/data/home";
 
 defineEmits(['change-page']);
 
 const transactionType = ref('');
+
 const navItems = [
   { label: '자재 마켓', page: 'marketplace', icon: 'M3 7h18M6 7V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2M5 7l1.2 12h11.6L19 7' },
   { label: 'AI 분석', icon: 'M12 3v3M12 18v3M5.64 5.64l2.12 2.12M16.24 16.24l2.12 2.12M3 12h3M18 12h3M9 12a3 3 0 1 0 6 0a3 3 0 0 0-6 0' },
@@ -20,10 +18,6 @@ const navItems = [
 
 const serviceLinks = ['자재 마켓', 'AI 분석', '자재 등록', '대시보드'];
 const supportLinks = ['공지사항', 'FAQ', '문의하기'];
-
-defineEmits<{
-  (event: "change-page", pageName: "home" | "login" | "signup" | "marketplace" | "register-material"): void;
-}>();
 </script>
 
 <template>
@@ -109,6 +103,7 @@ defineEmits<{
                 <label class="text-sm font-medium text-[#1a1a1a]">위치 *</label>
                 <input type="text" placeholder="예: 서울 강남구" class="h-11 w-full rounded-xl bg-[#f9fafb] px-4 text-sm outline-none ring-1 ring-transparent transition focus:bg-white focus:ring-[#8cc7c4]" />
               </div>
+            </div>
             <div class="space-y-2">
               <label class="flex min-h-4 items-center gap-2 text-sm font-medium text-[#1a1a1a]">거래 유형 *</label>
               <select
@@ -144,7 +139,8 @@ defineEmits<{
         </section>
 
         <section class="rounded-[18px] bg-white p-6 shadow-sm">
-        <RentalForm v-if="transactionType === '대여'" />
+          <RentalForm v-if="transactionType === '대여'" />
+        </section>
 
         <section class="rounded-[14px] bg-white p-6 shadow-sm">
           <h2 class="flex items-center gap-2 text-xl font-bold text-[#101828]">
