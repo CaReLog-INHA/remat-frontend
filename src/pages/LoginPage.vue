@@ -5,7 +5,7 @@ import svgPaths from '../svg-tp7jourdla';
 const emit = defineEmits(['change-page']);
 
 const handleSubmit = () => {
-  emit('change-page', 'home');
+  emit('change-page', 'my-page-profile');
 };
 </script>
 

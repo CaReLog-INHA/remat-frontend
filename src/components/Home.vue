@@ -8,7 +8,7 @@ import ValuesSection from "./home/ValuesSection.vue";
 import { footerLinks, heroStats, homeAssets, materialCards, navItems, valueCards } from "@/data/home";
 
 defineEmits<{
-  (event: "change-page", pageName: "home" | "login" | "signup" | "marketplace" | "register-material"): void;
+  (event: "change-page", pageName: "home" | "login" | "signup" | "marketplace" | "register-material" | "my-page-profile"): void;
 }>();
 </script>
 
