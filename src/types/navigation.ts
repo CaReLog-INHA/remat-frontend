@@ -3,6 +3,8 @@ export type PageName =
   | "login"
   | "signup"
   | "marketplace"
+  | "ai-analysis"
+  | "ai-analysis-result"
   | "register-material"
   | "trade-status"
   | "material-detail"

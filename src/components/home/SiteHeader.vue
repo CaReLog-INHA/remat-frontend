@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import RematLogo from "./RematLogo.vue";
 import type { PageName } from "@/types/navigation";
+import RematLogo from "./RematLogo.vue";
 
 withDefaults(
   defineProps<{
