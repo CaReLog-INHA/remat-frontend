@@ -1,0 +1,121 @@
+import { materials } from "@/data/materials";
+
+export const registeredMaterials = materials.slice(0, 3);
+
+export const tradeRequests = [
+  {
+    requester: "이벤트플러스",
+    initial: "이",
+    rating: "4.9",
+    company: "이벤트플러스(주)",
+    type: "구매 요청",
+    typeTone: "bg-[#eff6ff] text-[#155dfc]",
+    material: materials[0],
+    amount: "4,500,000원",
+    amountLabel: "예상 금액",
+    summary: "요청 수량: 10개",
+    message: "4월 중순 행사에 사용할 예정입니다. 배송 가능한가요?",
+    date: "2026-04-04",
+  },
+  {
+    requester: "박지훈",
+    initial: "박",
+    rating: "4.7",
+    company: "서울전시(주)",
+    type: "대여 요청",
+    typeTone: "bg-[#f3e8ff] text-[#8200db]",
+    material: materials[2],
+    amount: "1,250,000원",
+    amountLabel: "대여 금액",
+    summary: "요청 수량: 50개 · 2026-04-20 ~ 2026-04-25",
+    message: "5일간 대여하고 싶습니다. 비용은 어떻게 되나요?",
+    date: "2026-04-03",
+  },
+] as const;
+
+export const sentTradeRequests = [
+  {
+    seller: "에이스물류",
+    initial: "에",
+    company: "에이스물류(주)",
+    type: "구매 요청",
+    material: materials[4],
+    amount: "2,560,000원",
+    amountLabel: "예상 금액",
+    summary: "요청 수량: 8세트",
+    message: "창고 정리용으로 필요합니다. 할인이 가능한가요?",
+    date: "2026-04-06",
+    status: "대기 중",
+  },
+] as const;
+
+export const boughtHistories = [
+  {
+    partner: "한진물류",
+    initial: "한",
+    company: "한진물류(주)",
+    type: "구매 완료",
+    typeTone: "bg-[#eff6ff] text-[#155dfc]",
+    material: materials[1],
+    title: "목재 팔레트 대량 판매",
+    amount: "450,000원",
+    amountLabel: "총 금액",
+    summary: "요청 수량: 30개",
+    date: "2026-04-05",
+  },
+  {
+    partner: "이벤트플러스",
+    initial: "이",
+    company: "이벤트플러스(주)",
+    type: "대여 완료",
+    typeTone: "bg-[#f3e8ff] text-[#8200db]",
+    material: materials[2],
+    title: "행사용 접이식 의자",
+    amount: "2,000,000원",
+    amountLabel: "총 금액",
+    summary: "요청 수량: 80개 · 2026-04-10 ~ 2026-04-15",
+    date: "2026-04-02",
+  },
+  {
+    partner: "에이스물류",
+    initial: "에",
+    company: "에이스물류(주)",
+    type: "구매 완료",
+    typeTone: "bg-[#eff6ff] text-[#155dfc]",
+    material: materials[4],
+    title: "창고 보관용 선반 렉",
+    amount: "1,600,000원",
+    amountLabel: "총 금액",
+    summary: "요청 수량: 5세트",
+    date: "2026-03-28",
+  },
+] as const;
+
+export const soldHistories = [
+  {
+    partner: "김민수",
+    initial: "김",
+    company: "부산전시기획",
+    type: "구매 완료",
+    typeTone: "bg-[#eff6ff] text-[#155dfc]",
+    material: materials[0],
+    title: "전시 부스 파티션",
+    amount: "250,000원",
+    amountLabel: "총 수익",
+    summary: "판매 수량: 5개",
+    date: "2026-04-02",
+  },
+  {
+    partner: "대성건설",
+    initial: "대",
+    company: "대성건설(주)",
+    type: "대여 완료",
+    typeTone: "bg-[#f3e8ff] text-[#8200db]",
+    material: materials[5],
+    title: "건축 자재 철근 H빔",
+    amount: "800,000원",
+    amountLabel: "총 수익",
+    summary: "판매 수량: 20개 · 2026-04-15 ~ 2026-04-20",
+    date: "2026-04-05",
+  },
+] as const;

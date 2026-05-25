@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import IconPath from "./IconPath.vue";
 import MascotImage from "./MascotImage.vue";
+import type { PageName } from "@/types/navigation";
 
 defineProps<{
   mascotSrc: string;
-  stats: Array<{ value: string; label: string }>;
+  stats: ReadonlyArray<{ value: string; label: string }>;
 }>();
 
 defineEmits<{
-  (event: "change-page", pageName: "home" | "login" | "signup" | "register-material"): void;
+  (event: "change-page", pageName: PageName): void;
 }>();
 </script>
 

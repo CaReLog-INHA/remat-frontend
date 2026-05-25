@@ -6,9 +6,10 @@ import MyPageSummaryCards from "@/components/mypage/MyPageSummaryCards.vue";
 import MyPageTabs from "@/components/mypage/MyPageTabs.vue";
 import { footerLinks, homeAssets } from "@/data/home";
 import { myPageContacts, myPageNavItems } from "@/data/mypage";
+import type { PageName } from "@/types/navigation";
 
 defineEmits<{
-  (event: "change-page", pageName: "home" | "login" | "signup" | "marketplace" | "register-material" | "my-page-profile" | "my-page-badges"): void;
+  (event: "change-page", pageName: PageName): void;
 }>();
 </script>
 
