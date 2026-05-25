@@ -7,19 +7,16 @@ import { footerLinks, homeAssets } from "@/data/home";
 const transactionType = ref("");
 
 const navItems = [
-  { label: "자재 마켓", page: "marketplace", icon: "M3 7h18M6 7V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2M5 7l1.2 12h11.6L19 7" },
-  { label: "AI 분석", icon: "M12 3v3M12 18v3M5.64 5.64l2.12 2.12M16.24 16.24l2.12 2.12M3 12h3M18 12h3M9 12a3 3 0 1 0 6 0a3 3 0 0 0-6 0" },
-  { label: "자재 등록", page: "register-material", active: true, icon: "M12 5v14M5 12h14" },
-  { label: "거래현황", icon: "M4 19V5M8 17v-6M12 17V7M16 17v-3M20 19H4" },
-];
-
-const serviceLinks = ["자재 마켓", "AI 분석", "자재 등록", "대시보드"];
-const supportLinks = ["공지사항", "FAQ", "문의하기"];
+  { label: "자재 마켓", page: "marketplace", iconSrc: "/figma-icons/nav-market.svg" },
+  { label: "AI 분석", iconSrc: "/figma-icons/nav-ai.svg" },
+  { label: "자재 등록", page: "register-material", iconSrc: "/figma-icons/nav-upload.svg" },
+  { label: "거래현황", page: "trade-status", iconSrc: "/figma-icons/nav-trade.svg" },
+] as const;
 </script>
 
 <template>
   <div class="min-h-screen bg-[#fff6f6] text-[#101828]">
-    <SiteHeader :logo-icon-src="homeAssets.logoIcon" :nav-items="navItems.map((item) => ({ ...item, active: item.page === 'register-material' }))" account-variant="member" @change-page="$emit('change-page', $event)" />
+    <SiteHeader :logo-icon-src="homeAssets.logoIcon" :nav-items="navItems.map((item) => ({ ...item, active: 'page' in item && item.page === 'register-material' }))" @change-page="$emit('change-page', $event)" />
     <main class="pt-16">
       <section class="bg-[linear-gradient(90deg,#2c687b_0%,#8cc7c4_50%,#2c687b_100%)] py-12 text-white">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"><h1 class="text-4xl font-bold">자재 등록하기</h1><p class="mt-3 text-lg text-white/80">사용이 끝난 자재를 등록하고 새로운 수요자와 연결해보세요.</p></div>

@@ -3,9 +3,10 @@ import SiteFooter from "@/components/home/SiteFooter.vue";
 import SiteHeader from "@/components/home/SiteHeader.vue";
 import { footerLinks, homeAssets, navItems } from "@/data/home";
 import { materials } from "@/data/materials";
+import type { PageName } from "@/types/navigation";
 
 const emit = defineEmits<{
-  (event: "change-page", pageName: "home" | "login" | "signup" | "marketplace" | "register-material" | "material-detail" | "material-rental-detail", product?: unknown): void;
+  (event: "change-page", pageName: PageName, product?: unknown): void;
 }>();
 
 const filters = [

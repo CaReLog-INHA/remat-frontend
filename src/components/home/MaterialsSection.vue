@@ -3,7 +3,7 @@ import IconPath from "./IconPath.vue";
 import MaterialCard from "./MaterialCard.vue";
 
 defineProps<{
-  materials: Array<{
+  materials: ReadonlyArray<{
     image: string;
     category: string;
     status: string;

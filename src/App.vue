@@ -15,6 +15,7 @@ import MaterialRentalDetailPage from './pages/MaterialRentalDetailPage.vue';
 import MyPageProfilePage from './pages/MyPageProfilePage.vue';
 import RegisterMaterialPage from './pages/RegisterMaterialPage.vue';
 import SignupPage from './pages/SignupPage.vue';
+import TradeStatusPage from './pages/TradeStatusPage.vue';
 
 const currentPage = ref('home');
 const selectedProduct = ref(null);
@@ -59,6 +60,11 @@ const goToPage = (target, product = null) => {
 
   <RegisterMaterialPage
     v-else-if="currentPage === 'register-material'"
+    @change-page="goToPage"
+  />
+
+  <TradeStatusPage
+    v-else-if="currentPage === 'trade-status'"
     @change-page="goToPage"
   />
 

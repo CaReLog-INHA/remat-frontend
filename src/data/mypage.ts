@@ -4,7 +4,7 @@ export const myPageNavItems = [
   { label: "자재 마켓", page: "marketplace", iconSrc: "/figma-icons/nav-market.svg" },
   { label: "AI 분석", iconSrc: "/figma-icons/nav-ai.svg" },
   { label: "자재 등록", page: "register-material", iconSrc: "/figma-icons/nav-upload.svg" },
-  { label: "거래 현황", iconSrc: "/figma-icons/nav-trade.svg" },
+  { label: "거래 현황", page: "trade-status", iconSrc: "/figma-icons/nav-trade.svg" },
 ] as const;
 
 export const myPageSummaryCards = [
