@@ -1,22 +1,11 @@
 <script setup lang="ts">
 import RematLogo from "./RematLogo.vue";
-
-type PageName =
-  | "home"
-  | "login"
-  | "signup"
-  | "marketplace"
-  | "register-material"
-  | "my-page-profile"
-  | "my-page-badges"
-  | "my-page-registered-materials"
-  | "my-page-activity"
-  | "my-page-esg-report";
+import type { PageName } from "@/types/navigation";
 
 withDefaults(
   defineProps<{
     logoIconSrc: string;
-    navItems: Array<{ label: string; iconSrc: string; page?: PageName; active?: boolean }>;
+    navItems: ReadonlyArray<{ label: string; iconSrc: string; page?: PageName; active?: boolean }>;
     accountVariant?: "guest" | "member";
   }>(),
   {

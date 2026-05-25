@@ -6,9 +6,10 @@ import SiteFooter from "./home/SiteFooter.vue";
 import SiteHeader from "./home/SiteHeader.vue";
 import ValuesSection from "./home/ValuesSection.vue";
 import { footerLinks, heroStats, homeAssets, materialCards, navItems, valueCards } from "@/data/home";
+import type { PageName } from "@/types/navigation";
 
 defineEmits<{
-  (event: "change-page", pageName: "home" | "login" | "signup" | "marketplace" | "register-material" | "my-page-profile"): void;
+  (event: "change-page", pageName: PageName): void;
 }>();
 </script>
 

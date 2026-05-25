@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import type { PageName } from "@/types/navigation";
+
 defineEmits<{
-  (event: "change-page", pageName: "home" | "login" | "signup" | "register-material"): void;
+  (event: "change-page", pageName: PageName): void;
 }>();
 </script>
 
