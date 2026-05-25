@@ -6,6 +6,8 @@ type PageName =
   | "login"
   | "signup"
   | "marketplace"
+  | "ai-analysis"
+  | "ai-analysis-result"
   | "register-material"
   | "my-page-profile"
   | "my-page-badges"

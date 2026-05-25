@@ -4,6 +4,8 @@ import { ref } from 'vue';
 import HomePage from './pages/HomePage.vue';
 import LoginPage from './pages/LoginPage.vue';
 import MarketplacePage from './pages/MarketplacePage.vue';
+import AiAnalysisPage from './pages/AiAnalysisPage.vue';
+import AiAnalysisResultPage from './pages/AiAnalysisResultPage.vue';
 import MaterialDetailPage from './pages/MaterialDetailPage.vue';
 import MyPageBadgesPage from './pages/MyPageBadgesPage.vue';
 import MyPageRegisteredMaterialsPage from './pages/MyPageRegisteredMaterialsPage.vue';
@@ -42,6 +44,16 @@ const goToPage = (target, product = null) => {
 
   <MarketplacePage
     v-else-if="currentPage === 'marketplace'"
+    @change-page="goToPage"
+  />
+
+  <AiAnalysisPage
+    v-else-if="currentPage === 'ai-analysis'"
+    @change-page="goToPage"
+  />
+
+  <AiAnalysisResultPage
+    v-else-if="currentPage === 'ai-analysis-result'"
     @change-page="goToPage"
   />
 

@@ -9,9 +9,9 @@ export const homeAssets = {
 
 export const navItems = [
   { label: "자재 마켓", page: "marketplace", iconSrc: "/figma-icons/nav-market.svg" },
-  { label: "AI 분석", iconSrc: "/figma-icons/nav-ai.svg" },
+  { label: "AI 분석", page: "ai-analysis", iconSrc: "/figma-icons/nav-ai.svg" },
   { label: "자재 등록", page: "register-material", iconSrc: "/figma-icons/nav-upload.svg" },
-  { label: "거래 현황", iconSrc: "/figma-icons/nav-trade.svg" },
+  { label: "거래현황", iconSrc: "/figma-icons/nav-trade.svg" },
 ] as const;
 
 export const heroStats = [
@@ -23,7 +23,7 @@ export const heroStats = [
 export const valueCards = [
   {
     title: "자재 순환",
-    desc: "쓰이지 않는 자재를 필요한 곳에 연결해 비용을 줄이고 순환 경제를 실현합니다.",
+    desc: "버려지기 쉬운 자재를 필요한 곳에 연결해 비용을 줄이고 순환 경제를 실현합니다.",
     tone: "red",
     icon: "M7 7h10v10H7zM12 4v3M12 17v3M4 12h3M17 12h3",
   },
@@ -35,7 +35,7 @@ export const valueCards = [
   },
   {
     title: "ESG 데이터",
-    desc: "탄소 절감 효과를 수치로 확인하고 ESG 경영 자료로 바로 활용할 수 있는 데이터를 제공합니다.",
+    desc: "탄소 절감 효과를 수치로 확인하고 ESG 경영 자료로 바로 사용할 수 있는 데이터를 제공합니다.",
     tone: "teal",
     icon: "M5 19V5M9 19v-8M13 19V8M17 19v-5M21 19H3",
   },
