@@ -59,7 +59,10 @@ const estimatedPrice = computed(() => {
 });
 
 const estimatedCarbon = computed(() => `${(45 * quantity.value * rentalDays.value).toFixed(1)}kg CO₂`);
-const goBack = () => router.push({ name: "marketplace" });
+const goBack = () => {
+  if (window.history.state?.back) router.back();
+  else router.push({ name: "marketplace" });
+};
 const incrementQuantity = () => {
   quantity.value = Math.min(maxStock.value, quantity.value + 1);
 };
@@ -79,6 +82,16 @@ const closeRentalModal = () => {
   <div class="min-h-screen bg-[#fff6f6] text-[#101828]">
     <SiteHeader :logo-icon-src="homeAssets.logoIcon" :nav-items="[]" account-variant="member" />
     <main class="mx-auto max-w-7xl px-4 pb-6 pt-[88px] sm:px-6 lg:px-8">
+      <button
+        type="button"
+        class="mb-4 inline-flex items-center gap-2 text-sm font-medium text-[#475569] transition hover:text-[#2c687b]"
+        @click="goBack"
+      >
+        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        뒤로 가기
+      </button>
       <div class="grid gap-6 lg:grid-cols-[1fr_384px]">
         <section class="space-y-6">
           <div class="overflow-hidden rounded-[20px] border border-[#e5e7eb] bg-white shadow-sm">
