@@ -59,7 +59,6 @@ const totalCarbonSavings = `${transactionHistory.reduce((sum, record) => sum + p
       :logo-icon-src="homeAssets.logoIcon"
       :nav-items="myPageNavItems"
       account-variant="member"
-      @change-page="$emit('change-page', $event)"
     />
 
     <main class="pt-16 min-h-[calc(100vh-64px)]">
@@ -121,7 +120,7 @@ const totalCarbonSavings = `${transactionHistory.reduce((sum, record) => sum + p
 
       <section class="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
         <div class="rounded-[20px] border border-[#e5e7eb] bg-white p-6 shadow-[0_1px_1.5px_rgba(0,0,0,0.08),0_1px_1px_rgba(0,0,0,0.06)]">
-          <MyPageTabs current-page="my-page-esg-report" @change-page="$emit('change-page', $event)" />
+          <MyPageTabs current-page="my-page-esg-report" />
         </div>
 
         <div class="mt-6 grid gap-6 xl:grid-cols-[2fr_1fr]">

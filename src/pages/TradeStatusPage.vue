@@ -6,7 +6,6 @@ import TradeHistoryPanel from "@/components/trade-status/TradeHistoryPanel.vue";
 import TradeMaterialsPanel from "@/components/trade-status/TradeMaterialsPanel.vue";
 import TradeRequestsPanel from "@/components/trade-status/TradeRequestsPanel.vue";
 import { footerLinks, homeAssets, navItems } from "@/data/home";
-import type { PageName } from "@/types/navigation";
 
 type TradeTab = "materials" | "requests" | "history";
 
@@ -17,10 +16,6 @@ const tabs: ReadonlyArray<{ key: TradeTab; label: string; icon: "box" | "trend" 
   { key: "requests", label: "거래 요청", icon: "trend" },
   { key: "history", label: "거래 내역", icon: "coin" },
 ];
-
-defineEmits<{
-  (event: "change-page", pageName: PageName): void;
-}>();
 </script>
 
 <template>
@@ -29,7 +24,6 @@ defineEmits<{
       :logo-icon-src="homeAssets.logoIcon"
       :nav-items="navItems.map((item) => ({ ...item, active: item.page === 'trade-status' }))"
       account-variant="member"
-      @change-page="$emit('change-page', $event)"
     />
 
     <main class="pt-16">
@@ -92,7 +86,7 @@ defineEmits<{
             </button>
           </div>
 
-          <TradeMaterialsPanel v-if="activeTab === 'materials'" @change-page="$emit('change-page', $event)" />
+          <TradeMaterialsPanel v-if="activeTab === 'materials'" />
           <TradeRequestsPanel v-else-if="activeTab === 'requests'" />
           <TradeHistoryPanel v-else />
         </section>

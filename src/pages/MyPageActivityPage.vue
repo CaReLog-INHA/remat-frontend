@@ -6,10 +6,6 @@ import MyPageSummaryCards from "@/components/mypage/MyPageSummaryCards.vue";
 import MyPageTabs from "@/components/mypage/MyPageTabs.vue";
 import { footerLinks, homeAssets } from "@/data/home";
 import { myPageNavItems, myPageActivities } from "@/data/mypage";
-
-defineEmits<{
-  (event: "change-page", pageName: string): void;
-}>();
 </script>
 
 <template>
@@ -18,7 +14,6 @@ defineEmits<{
       :logo-icon-src="homeAssets.logoIcon"
       :nav-items="myPageNavItems"
       account-variant="member"
-      @change-page="$emit('change-page', $event)"
     />
 
     <main class="pt-16 min-h-[calc(100vh-64px)]">
@@ -28,7 +23,7 @@ defineEmits<{
         <MyPageSummaryCards />
 
         <div class="mt-6">
-          <MyPageTabs current-page="my-page-activity" @change-page="$emit('change-page', $event)" />
+          <MyPageTabs current-page="my-page-activity" />
         </div>
 
         <div class="mt-6 space-y-6">

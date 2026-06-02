@@ -6,11 +6,6 @@ import SiteFooter from "./home/SiteFooter.vue";
 import SiteHeader from "./home/SiteHeader.vue";
 import ValuesSection from "./home/ValuesSection.vue";
 import { footerLinks, heroStats, homeAssets, materialCards, navItems, valueCards } from "@/data/home";
-import type { PageName } from "@/types/navigation";
-
-defineEmits<{
-  (event: "change-page", pageName: PageName): void;
-}>();
 </script>
 
 <template>
@@ -18,18 +13,16 @@ defineEmits<{
     <SiteHeader
       :logo-icon-src="homeAssets.logoIcon"
       :nav-items="navItems"
-      @change-page="$emit('change-page', $event)"
     />
 
     <main class="pt-16">
       <HeroSection
         :mascot-src="homeAssets.mascot"
         :stats="heroStats"
-        @change-page="$emit('change-page', $event)"
       />
       <ValuesSection :values="valueCards" />
       <MaterialsSection :materials="materialCards" />
-      <CtaSection @change-page="$emit('change-page', $event)" />
+      <CtaSection />
     </main>
 
     <SiteFooter
