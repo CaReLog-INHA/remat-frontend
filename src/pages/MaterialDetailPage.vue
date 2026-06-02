@@ -1,39 +1,45 @@
 ﻿<script setup lang="ts">
 import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
 import SiteHeader from "@/components/home/SiteHeader.vue";
 import SiteFooter from "@/components/home/SiteFooter.vue";
 import { footerLinks, homeAssets } from "@/data/home";
+import { materials, type MaterialItem } from "@/data/materials";
 
-const props = defineProps({
-  product: {
-    type: Object,
-    default: () => null,
-  },
-});
+const props = defineProps<{
+  id: string;
+}>();
 
-const emit = defineEmits(["change-page"]);
+const router = useRouter();
 const quantity = ref(1);
 const isPurchaseModalOpen = ref(false);
 const requestMessage = ref("");
 
-const material = computed(() =>
-  props.product ?? {
-    image: "https://via.placeholder.com/1200x700?text=Material+Image",
-    category: "천재·금속",
-    condition: "최상",
-    title: "임시 부스용 천장 프레임",
-    description: "전시회 부스에서 사용 후 보관 중인 알루미늄 프레임입니다. 재조립이 쉬워 바로 현장에 투입할 수 있습니다.",
-    location: "서울 강남구",
-    price: 450000,
-    priceLabel: "450,000원",
-    stock: 20,
-    stockLabel: "20개 보유",
-    carbon: "85kg CO2",
-    seller: "서울전시(주)",
-    rating: "4.8",
-    registeredAt: "2026-04-03",
-  }
-);
+// TODO(API): 추후 id 기반으로 상세 API를 호출해 대체한다.
+const FALLBACK_MATERIAL: MaterialItem = {
+  id: "frame-sale",
+  tradeType: "sale",
+  image: "https://via.placeholder.com/1200x700?text=Material+Image",
+  category: "천재·금속",
+  condition: "최상",
+  title: "임시 부스용 천장 프레임",
+  desc: "전시회 부스에서 사용 후 보관 중인 알루미늄 프레임입니다. 재조립이 쉬워 바로 현장에 투입할 수 있습니다.",
+  location: "서울 강남구",
+  price: 450000,
+  priceLabel: "450,000원",
+  stock: 20,
+  stockLabel: "20개 보유",
+  carbon: "85kg CO2",
+  seller: "서울전시(주)",
+  rating: "4.8",
+  badgeLabel: "판매",
+  registeredAt: "2026-04-03",
+};
+
+const material = computed(() => {
+  const found = materials.find((item) => item.id === props.id) ?? FALLBACK_MATERIAL;
+  return { ...found, description: found.desc };
+});
 
 const maxStock = computed(() => (typeof material.value.stock === "number" ? material.value.stock : 20));
 
@@ -48,7 +54,7 @@ const totalCarbon = computed(() => {
   return `${(numeric * quantity.value).toFixed(1)}kg CO₂`;
 });
 
-const goBack = () => emit("change-page", "marketplace");
+const goBack = () => router.push({ name: "marketplace" });
 const incrementQuantity = () => { quantity.value = Math.min(maxStock.value, quantity.value + 1); };
 const decrementQuantity = () => { if (quantity.value > 1) quantity.value--; };
 const openPurchaseModal = () => {
@@ -62,8 +68,8 @@ const closePurchaseModal = () => {
 
 <template>
   <div class="min-h-screen bg-[#fff6f6] text-[#101828]">
-    <SiteHeader :logo-icon-src="homeAssets.logoIcon" :nav-items="[]" account-variant="member" @change-page="$emit('change-page', $event)" />
-    <main class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <SiteHeader :logo-icon-src="homeAssets.logoIcon" :nav-items="[]" account-variant="member" />
+    <main class="mx-auto max-w-7xl px-4 pb-6 pt-[88px] sm:px-6 lg:px-8">
       <div class="grid gap-6 lg:grid-cols-[1fr_360px]">
         <section class="space-y-6">
           <div class="overflow-hidden rounded-[20px] border border-[#e5e7eb] bg-white shadow-sm">

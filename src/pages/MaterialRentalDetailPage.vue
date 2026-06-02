@@ -1,31 +1,47 @@
 ﻿<script setup lang="ts">
 import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
 import SiteHeader from "@/components/home/SiteHeader.vue";
 import SiteFooter from "@/components/home/SiteFooter.vue";
 import { footerLinks, homeAssets } from "@/data/home";
+import { materials, type MaterialItem } from "@/data/materials";
 
-const props = defineProps({ product: { type: Object, default: () => null } });
-const emit = defineEmits(["change-page"]);
+const props = defineProps<{
+  id: string;
+}>();
+
+const router = useRouter();
 const quantity = ref(1);
 const startDate = ref("");
 const endDate = ref("");
 const isRentalModalOpen = ref(false);
 const requestMessage = ref("");
 
-const material = computed(() =>
-  props.product ?? {
-    image: "https://via.placeholder.com/1200x700?text=Rental+Item",
-    category: "가구",
-    condition: "최상",
-    title: "행사용 접이식 의자",
-    description: "행사 현장에서 사용한 접이식 의자입니다. 가볍고 적재가 쉬워 단기 프로젝트에 적합합니다.",
-    location: "서울 마포구",
-    price: 25000,
-    stock: 150,
-    stockLabel: "150개 보유",
-    registeredAt: "2026-04-04",
-  }
-);
+// TODO(API): 추후 id 기반 상세 API 호출로 대체. 현재는 mock 데이터 조회.
+const FALLBACK_MATERIAL: MaterialItem = {
+  id: "chair-rental",
+  tradeType: "rental",
+  image: "https://via.placeholder.com/1200x700?text=Rental+Item",
+  category: "가구",
+  condition: "최상",
+  title: "행사용 접이식 의자",
+  desc: "행사 현장에서 사용한 접이식 의자입니다. 가볍고 적재가 쉬워 단기 프로젝트에 적합합니다.",
+  location: "서울 마포구",
+  price: 25000,
+  priceLabel: "25,000원",
+  stock: 150,
+  stockLabel: "150개 보유",
+  carbon: "45kg CO2",
+  seller: "이벤트플러스",
+  rating: "4.9",
+  badgeLabel: "대여",
+  registeredAt: "2026-04-04",
+};
+
+const material = computed(() => {
+  const found = materials.find((item) => item.id === props.id) ?? FALLBACK_MATERIAL;
+  return { ...found, description: found.desc };
+});
 
 const maxStock = computed(() => (typeof material.value.stock === "number" ? material.value.stock : 150));
 
@@ -43,7 +59,7 @@ const estimatedPrice = computed(() => {
 });
 
 const estimatedCarbon = computed(() => `${(45 * quantity.value * rentalDays.value).toFixed(1)}kg CO₂`);
-const goBack = () => emit("change-page", "marketplace");
+const goBack = () => router.push({ name: "marketplace" });
 const incrementQuantity = () => {
   quantity.value = Math.min(maxStock.value, quantity.value + 1);
 };
@@ -61,8 +77,8 @@ const closeRentalModal = () => {
 
 <template>
   <div class="min-h-screen bg-[#fff6f6] text-[#101828]">
-    <SiteHeader :logo-icon-src="homeAssets.logoIcon" :nav-items="[]" account-variant="member" @change-page="$emit('change-page', $event)" />
-    <main class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <SiteHeader :logo-icon-src="homeAssets.logoIcon" :nav-items="[]" account-variant="member" />
+    <main class="mx-auto max-w-7xl px-4 pb-6 pt-[88px] sm:px-6 lg:px-8">
       <div class="grid gap-6 lg:grid-cols-[1fr_384px]">
         <section class="space-y-6">
           <div class="overflow-hidden rounded-[20px] border border-[#e5e7eb] bg-white shadow-sm">

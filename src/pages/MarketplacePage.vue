@@ -1,13 +1,11 @@
 <script setup lang="ts">
+import { useRouter } from "vue-router";
 import SiteFooter from "@/components/home/SiteFooter.vue";
 import SiteHeader from "@/components/home/SiteHeader.vue";
 import { footerLinks, homeAssets, navItems } from "@/data/home";
 import { materials } from "@/data/materials";
-import type { PageName } from "@/types/navigation";
 
-const emit = defineEmits<{
-  (event: "change-page", pageName: PageName, product?: unknown): void;
-}>();
+const router = useRouter();
 
 const filters = [
   { label: "카테고리", value: "전체" },
@@ -17,7 +15,10 @@ const filters = [
 ];
 
 const handleMaterialClick = (material: (typeof materials)[number]) => {
-  emit("change-page", material.tradeType === "sale" ? "material-detail" : "material-rental-detail", material);
+  router.push({
+    name: material.tradeType === "sale" ? "material-detail" : "material-rental-detail",
+    params: { id: material.id },
+  });
 };
 </script>
 
@@ -26,7 +27,6 @@ const handleMaterialClick = (material: (typeof materials)[number]) => {
     <SiteHeader
       :logo-icon-src="homeAssets.logoIcon"
       :nav-items="navItems.map((item) => ({ ...item, active: item.page === 'marketplace' }))"
-      @change-page="$emit('change-page', $event)"
     />
 
     <main class="pt-16">
@@ -70,7 +70,7 @@ const handleMaterialClick = (material: (typeof materials)[number]) => {
           <p class="text-base text-[#4a5565]">
             총 <strong class="text-[#db1a1a]">{{ materials.length }}</strong>개의 자재
           </p>
-          <button type="button" class="inline-flex h-10 items-center gap-2 rounded-xl bg-[#db1a1a] px-4 text-sm font-medium text-white transition hover:bg-[#c01616]" @click="$emit('change-page', 'register-material')">
+          <button type="button" class="inline-flex h-10 items-center gap-2 rounded-xl bg-[#db1a1a] px-4 text-sm font-medium text-white transition hover:bg-[#c01616]" @click="router.push({ name: 'register-material' })">
             <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 5v14M5 12h14" stroke-linecap="round" />
             </svg>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useRouter } from "vue-router";
 import materialChair from "@/assets/material-chair.png";
 import materialFrame from "@/assets/material-frame.png";
 import materialPallets from "@/assets/material-pallets.png";
@@ -6,9 +7,8 @@ import SiteFooter from "@/components/home/SiteFooter.vue";
 import SiteHeader from "@/components/home/SiteHeader.vue";
 import { footerLinks, homeAssets, navItems } from "@/data/home";
 
-const emit = defineEmits<{
-  (event: "change-page", page: string, product?: unknown): void;
-}>();
+const router = useRouter();
+const go = (name: string) => router.push({ name });
 
 const stats = [
   { label: "매칭된 자재", value: "3개", note: "ReMat의 자재 목록과 조건이 맞는 자재", color: "text-[#7c3aed]", iconColor: "text-[#8b5cf6]", iconPath: "M8 12h8M12 8v8" },
@@ -65,21 +65,9 @@ const extraMaterials = [
 ];
 
 const openMaterial = (material: (typeof matchedMaterials)[number]) => {
-  emit("change-page", material.tradeType === "sale" ? "material-detail" : "material-rental-detail", {
-    image: material.image,
-    category: material.category,
-    condition: "최상",
-    title: material.title,
-    desc: material.desc,
-    description: material.desc,
-    location: material.location,
-    price: Number(material.priceLabel.replace(/[^0-9]/g, "")),
-    priceLabel: material.priceLabel,
-    stockLabel: material.stockLabel,
-    carbon: material.carbon,
-    seller: "ReMat 추천 파트너",
-    rating: "4.8",
-    registeredAt: "2026-05-22",
+  router.push({
+    name: material.tradeType === "sale" ? "material-detail" : "material-rental-detail",
+    params: { id: material.id },
   });
 };
 </script>
@@ -90,7 +78,6 @@ const openMaterial = (material: (typeof matchedMaterials)[number]) => {
       :logo-icon-src="homeAssets.logoIcon"
       :nav-items="navItems.map((item) => ({ ...item, active: item.page === 'ai-analysis' }))"
       account-variant="member"
-      @change-page="$emit('change-page', $event)"
     />
 
     <main class="pt-16">
@@ -215,10 +202,10 @@ const openMaterial = (material: (typeof matchedMaterials)[number]) => {
         </section>
 
         <div class="mt-10 grid gap-3 md:grid-cols-2">
-          <button type="button" class="h-11 rounded-lg border border-[#d7e0ea] bg-white text-sm font-semibold text-[#475569] transition hover:border-[#8cc7c4]" @click="emit('change-page', 'ai-analysis')">
+          <button type="button" class="h-11 rounded-lg border border-[#d7e0ea] bg-white text-sm font-semibold text-[#475569] transition hover:border-[#8cc7c4]" @click="go('ai-analysis')">
             데이터에 더 찾아보기
           </button>
-          <button type="button" class="h-11 rounded-lg bg-[#ef4444] text-sm font-semibold text-white transition hover:bg-[#dc2626]" @click="emit('change-page', 'marketplace')">
+          <button type="button" class="h-11 rounded-lg bg-[#ef4444] text-sm font-semibold text-white transition hover:bg-[#dc2626]" @click="go('marketplace')">
             새로운 분석 시작
           </button>
         </div>
