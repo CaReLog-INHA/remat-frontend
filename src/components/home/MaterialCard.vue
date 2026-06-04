@@ -1,5 +1,10 @@
 <script setup lang="ts">
+import type { TradeType } from "@/data/materials";
+
+
 defineProps<{
+  id: string;
+  tradeType: TradeType;
   image: string;
   category: string;
   status: string;
