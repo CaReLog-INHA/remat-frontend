@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import SiteFooter from "@/components/home/SiteFooter.vue";
-import SiteHeader from "@/components/home/SiteHeader.vue";
-import { footerLinks, homeAssets, navItems } from "@/data/home";
+import DefaultLayout from "@/layouts/DefaultLayout.vue";
+import { homeAssets } from "@/data/home";
 
 const router = useRouter();
 const go = (name: string) => router.push({ name });
@@ -71,14 +70,7 @@ const benefitCards = [
 </script>
 
 <template>
-  <div class="min-h-screen bg-[linear-gradient(180deg,#fff7f7_0%,#effbfb_100%)] text-[#101828]">
-    <SiteHeader
-      :logo-icon-src="homeAssets.logoIcon"
-      :nav-items="navItems.map((item) => ({ ...item, active: item.page === 'ai-analysis' }))"
-      account-variant="member"
-    />
-
-    <main class="pt-16">
+  <DefaultLayout active-page="ai-analysis">
       <section class="relative overflow-hidden bg-[linear-gradient(90deg,#2f6f82_0%,#7bb7bd_100%)] text-white">
         <div class="absolute inset-y-0 right-0 w-1/3 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.16),transparent_70%)]" aria-hidden="true" />
         <div class="mx-auto flex max-w-7xl items-center justify-between gap-8 px-4 py-10 sm:px-6 lg:px-8">
@@ -151,13 +143,5 @@ const benefitCards = [
           </article>
         </div>
       </section>
-    </main>
-
-    <SiteFooter
-      :logo-icon-src="homeAssets.logoIcon"
-      :mascot-src="homeAssets.mascot"
-      :service-links="footerLinks.service"
-      :support-links="footerLinks.support"
-    />
-  </div>
+  </DefaultLayout>
 </template>

@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import SiteFooter from "@/components/home/SiteFooter.vue";
-import SiteHeader from "@/components/home/SiteHeader.vue";
+import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import MyPageTabs from "@/components/mypage/MyPageTabs.vue";
-import { footerLinks, homeAssets } from "@/data/home";
 import { myPageNavItems } from "@/data/mypage";
 
 const reportSummary = [
@@ -54,14 +52,7 @@ const totalCarbonSavings = `${transactionHistory.reduce((sum, record) => sum + p
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#fff6f6] text-[#101828]">
-    <SiteHeader
-      :logo-icon-src="homeAssets.logoIcon"
-      :nav-items="myPageNavItems"
-      account-variant="member"
-    />
-
-    <main class="pt-16 min-h-[calc(100vh-64px)]">
+  <DefaultLayout :nav-items="myPageNavItems">
       <section class="bg-[linear-gradient(90deg,#2c687b_0%,#70b8bf_100%)] pb-16 pt-8">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div class="overflow-hidden rounded-[32px] bg-white/90 shadow-[0_36px_80px_rgba(15,23,42,0.16)] backdrop-blur-md">
@@ -223,13 +214,5 @@ const totalCarbonSavings = `${transactionHistory.reduce((sum, record) => sum + p
           </p>
         </div>
       </section>
-    </main>
-
-    <SiteFooter
-      :logo-icon-src="homeAssets.logoIcon"
-      :mascot-src="homeAssets.mascot"
-      :service-links="footerLinks.service"
-      :support-links="footerLinks.support"
-    />
-  </div>
+  </DefaultLayout>
 </template>

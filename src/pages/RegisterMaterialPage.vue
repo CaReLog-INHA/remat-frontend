@@ -1,25 +1,15 @@
 ﻿<script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import SiteHeader from "@/components/home/SiteHeader.vue";
-import SiteFooter from "@/components/home/SiteFooter.vue";
-import { footerLinks, homeAssets } from "@/data/home";
+import DefaultLayout from "@/layouts/DefaultLayout.vue";
+import { homeAssets } from "@/data/home";
 
 const router = useRouter();
 const transactionType = ref("");
-
-const navItems = [
-  { label: "자재 마켓", page: "marketplace", iconSrc: "/figma-icons/nav-market.svg" },
-  { label: "AI 분석", iconSrc: "/figma-icons/nav-ai.svg" },
-  { label: "자재 등록", page: "register-material", iconSrc: "/figma-icons/nav-upload.svg" },
-  { label: "거래현황", page: "trade-status", iconSrc: "/figma-icons/nav-trade.svg" },
-] as const;
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#fff6f6] text-[#101828]">
-    <SiteHeader :logo-icon-src="homeAssets.logoIcon" :nav-items="navItems.map((item) => ({ ...item, active: 'page' in item && item.page === 'register-material' }))" />
-    <main class="pt-16">
+  <DefaultLayout active-page="register-material">
       <section class="bg-[linear-gradient(90deg,#2c687b_0%,#8cc7c4_50%,#2c687b_100%)] py-12 text-white">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"><h1 class="text-4xl font-bold">자재 등록하기</h1><p class="mt-3 text-lg text-white/80">사용이 끝난 자재를 등록하고 새로운 수요자와 연결해보세요.</p></div>
       </section>
@@ -59,7 +49,5 @@ const navItems = [
         <div class="grid gap-3 sm:grid-cols-2"><button type="button" class="h-11 rounded-xl border border-black/10 bg-[#fff6f6] text-sm font-medium text-[#1a1a1a]" @click="router.push({ name: 'marketplace' })">취소</button><button type="submit" class="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#db1a1a] text-sm font-medium text-white transition hover:bg-[#c01616]"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round" /></svg>자재 등록하기</button></div>
         <p class="text-center text-xs leading-5 text-[#6b7280]">* 표시된 항목은 필수 입력 정보입니다.<br />등록된 자재는 관리자 검수 후 24시간 이내에 반영됩니다.</p>
       </form>
-    </main>
-    <SiteFooter :logo-icon-src="homeAssets.logoIcon" :mascot-src="homeAssets.mascot" :service-links="footerLinks.service" :support-links="footerLinks.support" />
-  </div>
+  </DefaultLayout>
 </template>

@@ -1,22 +1,14 @@
 <script setup lang="ts">
-import SiteFooter from "@/components/home/SiteFooter.vue";
-import SiteHeader from "@/components/home/SiteHeader.vue";
+import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import MyPageHero from "@/components/mypage/MyPageHero.vue";
 import MyPageSummaryCards from "@/components/mypage/MyPageSummaryCards.vue";
 import MyPageTabs from "@/components/mypage/MyPageTabs.vue";
-import { footerLinks, homeAssets } from "@/data/home";
+import { homeAssets } from "@/data/home";
 import { myPageNavItems, myPageActivities } from "@/data/mypage";
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#fff6f6] text-[#101828]">
-    <SiteHeader
-      :logo-icon-src="homeAssets.logoIcon"
-      :nav-items="myPageNavItems"
-      account-variant="member"
-    />
-
-    <main class="pt-16 min-h-[calc(100vh-64px)]">
+  <DefaultLayout :nav-items="myPageNavItems">
       <MyPageHero :mascot-src="homeAssets.mascot" />
 
       <section class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -76,13 +68,5 @@ import { myPageNavItems, myPageActivities } from "@/data/mypage";
           </section>
         </div>
       </section>
-    </main>
-
-    <SiteFooter
-      :logo-icon-src="homeAssets.logoIcon"
-      :mascot-src="homeAssets.mascot"
-      :service-links="footerLinks.service"
-      :support-links="footerLinks.support"
-    />
-  </div>
+  </DefaultLayout>
 </template>
