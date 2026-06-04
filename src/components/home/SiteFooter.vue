@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import MascotImage from "./MascotImage.vue";
-import RematLogo from "./RematLogo.vue";
 
 defineProps<{
-  logoIconSrc: string;
   mascotSrc: string;
   serviceLinks: string[];
   supportLinks: string[];
@@ -18,8 +16,14 @@ defineProps<{
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="grid gap-10 md:grid-cols-[1fr_280px_280px]">
         <div>
-          <div class="flex items-center">
-            <RematLogo :icon-src="logoIconSrc" variant="footer" />
+          <div class="flex items-center gap-3">
+            <span class="grid size-10 shrink-0 place-items-center overflow-hidden rounded-[12px] bg-white/10">
+              <img :src="mascotSrc" alt="" class="size-8 object-contain" />
+            </span>
+            <span class="flex flex-col leading-none">
+              <strong class="text-[20px] font-bold leading-7 tracking-[-0.45px] text-white">ReMat</strong>
+              <span class="text-[10px] leading-[15px] tracking-[0.37px] text-white/45">Re + Material</span>
+            </span>
           </div>
           <p class="mt-5 text-base text-white/75">ESG 기반 자재 재사용 플랫폼</p>
           <p class="mt-3 max-w-md text-sm leading-6 text-white/55">
