@@ -1,16 +1,14 @@
 <script setup lang="ts">
+import { useRouter } from "vue-router";
 import IconPath from "./IconPath.vue";
 import MascotImage from "./MascotImage.vue";
-import type { PageName } from "@/types/navigation";
 
 defineProps<{
   mascotSrc: string;
   stats: ReadonlyArray<{ value: string; label: string }>;
 }>();
 
-defineEmits<{
-  (event: "change-page", pageName: PageName): void;
-}>();
+const router = useRouter();
 </script>
 
 <template>
@@ -33,14 +31,18 @@ defineEmits<{
           남는 자재를 필요한 곳에 연결해 조달 비용을 낮추고 탄소 배출을 줄이는 순환형 자재 거래 플랫폼입니다.
         </p>
         <div class="mt-8 flex flex-wrap gap-4">
-          <a href="#materials" class="inline-flex h-10 items-center gap-2 rounded-[8px] bg-white px-4 text-sm font-semibold text-[#2c687b] shadow-sm transition hover:bg-[#fff6f6]">
+          <button
+            type="button"
+            class="inline-flex h-10 items-center gap-2 rounded-[8px] bg-white px-4 text-sm font-semibold text-[#2c687b] shadow-sm transition hover:bg-[#fff6f6]"
+            @click="router.push({ name: 'marketplace' })"
+          >
             <IconPath path="M3 7h18M6 7V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2M5 7l1.2 12h11.6L19 7" />
-            자재 둘러보기
-          </a>
+            자재 찾아보기
+          </button>
           <button
             type="button"
             class="inline-flex h-10 items-center gap-2 rounded-[8px] border-2 border-white px-4 text-sm font-semibold text-white transition hover:bg-white/10"
-            @click="$emit('change-page', 'register-material')"
+            @click="router.push({ name: 'register-material' })"
           >
             자재 등록하기
             <IconPath path="M5 12h14M13 5l7 7l-7 7" />

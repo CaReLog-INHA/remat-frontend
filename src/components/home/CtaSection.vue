@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import type { PageName } from "@/types/navigation";
+import { useRouter } from "vue-router";
 
-defineEmits<{
-  (event: "change-page", pageName: PageName): void;
-}>();
+const router = useRouter();
 </script>
 
 <template>
@@ -19,7 +17,7 @@ defineEmits<{
         <button
           type="button"
           class="inline-flex h-10 items-center rounded-[8px] bg-[#db1a1a] px-4 text-sm font-semibold text-white transition hover:bg-[#c01616]"
-          @click="$emit('change-page', 'register-material')"
+          @click="router.push({ name: 'register-material' })"
         >
           자재 등록하기
         </button>

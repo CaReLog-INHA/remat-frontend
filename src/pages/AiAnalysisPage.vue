@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import SiteFooter from "@/components/home/SiteFooter.vue";
-import SiteHeader from "@/components/home/SiteHeader.vue";
-import { footerLinks, homeAssets, navItems } from "@/data/home";
+import { useRouter } from "vue-router";
+import DefaultLayout from "@/layouts/DefaultLayout.vue";
+import { homeAssets } from "@/data/home";
 
-const emit = defineEmits<{
-  (event: "change-page", pageName: string): void;
-}>();
+const router = useRouter();
+const go = (name: string) => router.push({ name });
 
 const steps = [
   {
@@ -71,15 +70,7 @@ const benefitCards = [
 </script>
 
 <template>
-  <div class="min-h-screen bg-[linear-gradient(180deg,#fff7f7_0%,#effbfb_100%)] text-[#101828]">
-    <SiteHeader
-      :logo-icon-src="homeAssets.logoIcon"
-      :nav-items="navItems.map((item) => ({ ...item, active: item.page === 'ai-analysis' }))"
-      account-variant="member"
-      @change-page="$emit('change-page', $event)"
-    />
-
-    <main class="pt-16">
+  <DefaultLayout active-page="ai-analysis">
       <section class="relative overflow-hidden bg-[linear-gradient(90deg,#2f6f82_0%,#7bb7bd_100%)] text-white">
         <div class="absolute inset-y-0 right-0 w-1/3 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.16),transparent_70%)]" aria-hidden="true" />
         <div class="mx-auto flex max-w-7xl items-center justify-between gap-8 px-4 py-10 sm:px-6 lg:px-8">
@@ -124,10 +115,10 @@ const benefitCards = [
             <p class="mt-5 text-base font-semibold text-[#374151]">PDF 파일을 드래그하거나 클릭하여 업로드</p>
             <p class="mt-2 text-sm text-[#9ca3af]">최대 50MB까지 업로드 가능합니다</p>
             <div class="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <button type="button" class="inline-flex h-10 items-center justify-center rounded-lg border border-[#d6dbe4] bg-white px-5 text-sm font-semibold text-[#475569] transition hover:border-[#8cc7c4]" @click="emit('change-page', 'ai-analysis-result')">
+              <button type="button" class="inline-flex h-10 items-center justify-center rounded-lg border border-[#d6dbe4] bg-white px-5 text-sm font-semibold text-[#475569] transition hover:border-[#8cc7c4]" @click="go('ai-analysis-result')">
                 샘플 결과 보기
               </button>
-              <button type="button" class="inline-flex h-10 items-center justify-center rounded-lg bg-[#ef4444] px-5 text-sm font-semibold text-white transition hover:bg-[#dc2626]" @click="emit('change-page', 'ai-analysis-result')">
+              <button type="button" class="inline-flex h-10 items-center justify-center rounded-lg bg-[#ef4444] px-5 text-sm font-semibold text-white transition hover:bg-[#dc2626]" @click="go('ai-analysis-result')">
                 파일 선택하기
               </button>
             </div>
@@ -152,13 +143,5 @@ const benefitCards = [
           </article>
         </div>
       </section>
-    </main>
-
-    <SiteFooter
-      :logo-icon-src="homeAssets.logoIcon"
-      :mascot-src="homeAssets.mascot"
-      :service-links="footerLinks.service"
-      :support-links="footerLinks.support"
-    />
-  </div>
+  </DefaultLayout>
 </template>

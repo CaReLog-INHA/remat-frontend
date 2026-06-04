@@ -42,6 +42,8 @@ export const valueCards = [
 ] as const;
 
 export const materialCards = materials.slice(0, 3).map((item) => ({
+  id: item.id,
+  tradeType: item.tradeType,
   image: item.image,
   category: item.category,
   status: item.condition,

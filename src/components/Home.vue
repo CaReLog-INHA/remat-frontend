@@ -1,42 +1,20 @@
 <script setup lang="ts">
+import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import CtaSection from "./home/CtaSection.vue";
 import HeroSection from "./home/HeroSection.vue";
 import MaterialsSection from "./home/MaterialsSection.vue";
-import SiteFooter from "./home/SiteFooter.vue";
-import SiteHeader from "./home/SiteHeader.vue";
 import ValuesSection from "./home/ValuesSection.vue";
-import { footerLinks, heroStats, homeAssets, materialCards, navItems, valueCards } from "@/data/home";
-import type { PageName } from "@/types/navigation";
-
-defineEmits<{
-  (event: "change-page", pageName: PageName): void;
-}>();
+import { heroStats, homeAssets, materialCards, valueCards } from "@/data/home";
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#fff6f6] text-[#101828]">
-    <SiteHeader
-      :logo-icon-src="homeAssets.logoIcon"
-      :nav-items="navItems"
-      @change-page="$emit('change-page', $event)"
-    />
-
-    <main class="pt-16">
-      <HeroSection
-        :mascot-src="homeAssets.mascot"
-        :stats="heroStats"
-        @change-page="$emit('change-page', $event)"
-      />
-      <ValuesSection :values="valueCards" />
-      <MaterialsSection :materials="materialCards" />
-      <CtaSection @change-page="$emit('change-page', $event)" />
-    </main>
-
-    <SiteFooter
-      :logo-icon-src="homeAssets.logoIcon"
+  <DefaultLayout>
+    <HeroSection
       :mascot-src="homeAssets.mascot"
-      :service-links="footerLinks.service"
-      :support-links="footerLinks.support"
+      :stats="heroStats"
     />
-  </div>
+    <ValuesSection :values="valueCards" />
+    <MaterialsSection :materials="materialCards" />
+    <CtaSection />
+  </DefaultLayout>
 </template>

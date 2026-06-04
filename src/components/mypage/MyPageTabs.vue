@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useRouter } from "vue-router";
 import type { MyPageRoute } from "@/data/mypage";
 import { myPageTabs } from "@/data/mypage";
 
@@ -6,9 +7,8 @@ defineProps<{
   currentPage: MyPageRoute;
 }>();
 
-defineEmits<{
-  (event: "change-page", pageName: MyPageRoute): void;
-}>();
+const router = useRouter();
+const go = (name: MyPageRoute) => router.push({ name });
 </script>
 
 <template>
@@ -21,7 +21,7 @@ defineEmits<{
         'rounded-full px-4 py-2 text-sm font-medium transition duration-200',
         currentPage === tab.page ? 'bg-[#2c687b] text-white shadow-sm' : 'text-[#475569] hover:bg-[#f8fafc]',
       ]"
-      @click="tab.page ? $emit('change-page', tab.page) : undefined"
+      @click="tab.page ? go(tab.page) : undefined"
     >
       {{ tab.label }}
     </button>

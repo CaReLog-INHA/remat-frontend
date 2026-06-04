@@ -1,37 +1,23 @@
 <script setup lang="ts">
-import SiteFooter from "@/components/home/SiteFooter.vue";
-import SiteHeader from "@/components/home/SiteHeader.vue";
+import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import MyPageHero from "@/components/mypage/MyPageHero.vue";
 import MyPageSummaryCards from "@/components/mypage/MyPageSummaryCards.vue";
 import MyPageTabs from "@/components/mypage/MyPageTabs.vue";
-import { footerLinks, homeAssets } from "@/data/home";
+import { homeAssets } from "@/data/home";
 import { myPageBadges, myPageNavItems } from "@/data/mypage";
-import type { PageName } from "@/types/navigation";
-
-defineEmits<{
-  (event: "change-page", pageName: PageName): void;
-}>();
 
 const earnedCount = myPageBadges.filter((badge) => badge.earned).length;
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#fff6f6] text-[#101828]">
-    <SiteHeader
-      :logo-icon-src="homeAssets.logoIcon"
-      :nav-items="myPageNavItems"
-      account-variant="member"
-      @change-page="$emit('change-page', $event)"
-    />
-
-    <main class="pt-16 min-h-[calc(100vh-64px)]">
+  <DefaultLayout :nav-items="myPageNavItems">
       <MyPageHero :mascot-src="homeAssets.mascot" />
 
       <section class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <MyPageSummaryCards />
 
         <div class="mt-6">
-          <MyPageTabs current-page="my-page-badges" @change-page="$emit('change-page', $event)" />
+          <MyPageTabs current-page="my-page-badges" />
         </div>
 
         <section class="mt-6 rounded-[16px] border border-[#e5e7eb] bg-white p-6 shadow-[0_1px_1.5px_rgba(0,0,0,0.1),0_1px_1px_rgba(0,0,0,0.08)]">
@@ -87,13 +73,5 @@ const earnedCount = myPageBadges.filter((badge) => badge.earned).length;
           </div>
         </section>
       </section>
-    </main>
-
-    <SiteFooter
-      :logo-icon-src="homeAssets.logoIcon"
-      :mascot-src="homeAssets.mascot"
-      :service-links="footerLinks.service"
-      :support-links="footerLinks.support"
-    />
-  </div>
+  </DefaultLayout>
 </template>

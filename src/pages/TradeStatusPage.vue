@@ -1,12 +1,9 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import SiteFooter from "@/components/home/SiteFooter.vue";
-import SiteHeader from "@/components/home/SiteHeader.vue";
+import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import TradeHistoryPanel from "@/components/trade-status/TradeHistoryPanel.vue";
 import TradeMaterialsPanel from "@/components/trade-status/TradeMaterialsPanel.vue";
 import TradeRequestsPanel from "@/components/trade-status/TradeRequestsPanel.vue";
-import { footerLinks, homeAssets, navItems } from "@/data/home";
-import type { PageName } from "@/types/navigation";
 
 type TradeTab = "materials" | "requests" | "history";
 
@@ -17,22 +14,10 @@ const tabs: ReadonlyArray<{ key: TradeTab; label: string; icon: "box" | "trend" 
   { key: "requests", label: "거래 요청", icon: "trend" },
   { key: "history", label: "거래 내역", icon: "coin" },
 ];
-
-defineEmits<{
-  (event: "change-page", pageName: PageName): void;
-}>();
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#fff6f6] text-[#101828]">
-    <SiteHeader
-      :logo-icon-src="homeAssets.logoIcon"
-      :nav-items="navItems.map((item) => ({ ...item, active: item.page === 'trade-status' }))"
-      account-variant="member"
-      @change-page="$emit('change-page', $event)"
-    />
-
-    <main class="pt-16">
+  <DefaultLayout active-page="trade-status">
       <section class="bg-[linear-gradient(90deg,#2c687b_0%,rgba(44,104,123,0.9)_100%)] py-12 text-white">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h1 class="text-4xl font-bold">거래현황</h1>
@@ -92,7 +77,7 @@ defineEmits<{
             </button>
           </div>
 
-          <TradeMaterialsPanel v-if="activeTab === 'materials'" @change-page="$emit('change-page', $event)" />
+          <TradeMaterialsPanel v-if="activeTab === 'materials'" />
           <TradeRequestsPanel v-else-if="activeTab === 'requests'" />
           <TradeHistoryPanel v-else />
         </section>
@@ -116,13 +101,5 @@ defineEmits<{
           </div>
         </section>
       </section>
-    </main>
-
-    <SiteFooter
-      :logo-icon-src="homeAssets.logoIcon"
-      :mascot-src="homeAssets.mascot"
-      :service-links="footerLinks.service"
-      :support-links="footerLinks.support"
-    />
-  </div>
+  </DefaultLayout>
 </template>

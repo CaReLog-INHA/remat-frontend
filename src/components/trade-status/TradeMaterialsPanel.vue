@@ -1,9 +1,8 @@
 <script setup lang="ts">
+import { useRouter } from "vue-router";
 import { registeredMaterials } from "@/data/tradeStatus";
 
-defineEmits<{
-  (event: "change-page", pageName: "register-material"): void;
-}>();
+const router = useRouter();
 </script>
 
 <template>
@@ -12,7 +11,7 @@ defineEmits<{
     <button
       type="button"
       class="inline-flex h-9 items-center justify-center gap-2 rounded-[8px] bg-[#db1a1a] px-3 text-sm font-medium text-white transition hover:bg-[#c01616]"
-      @click="$emit('change-page', 'register-material')"
+      @click="router.push({ name: 'register-material' })"
     >
       <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M12 5v14M5 12h14" stroke-linecap="round" />
