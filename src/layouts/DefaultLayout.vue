@@ -11,6 +11,11 @@ const props = withDefaults(
   defineProps<{
     /** 현재 페이지에 해당하는 nav 항목을 활성화 표시한다. */
     activePage?: PageName;
+    /**
+     * 헤더 우측 계정 영역 표시.
+     * - 생략하면 auth 스토어의 로그인 상태에 따라 자동 결정됨
+     * - 특정 페이지(예: 로그인/회원가입)에서 강제로 지정하고 싶을 때만 prop 전달
+     */
     accountVariant?: "guest" | "member";
     /**
      * 헤더에 표시할 메뉴 목록을 직접 지정한다.
@@ -21,7 +26,6 @@ const props = withDefaults(
     navItems?: ReadonlyArray<NavItem>;
   }>(),
   {
-    accountVariant: "member",
     navItems: () => defaultNavItems,
   },
 );
