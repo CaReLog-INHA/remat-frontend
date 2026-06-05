@@ -1,13 +1,33 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router";
+import { ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import { homeAssets } from "@/data/home";
+import { useAuthStore } from "@/stores/auth";
 
 const router = useRouter();
+const route = useRoute();
+const authStore = useAuthStore();
 const go = (name: string) => router.push({ name });
 
-const handleSubmit = () => {
-  router.push({ name: "home" });
+const email = ref("");
+const password = ref("");
+const errorMessage = ref("");
+const isSubmitting = ref(false);
+
+const handleSubmit = async () => {
+  if (isSubmitting.value) return;
+  errorMessage.value = "";
+  isSubmitting.value = true;
+  try {
+    await authStore.login({ email: email.value, password: password.value });
+    const redirect = typeof route.query.redirect === "string" ? route.query.redirect : null;
+    router.push(redirect ?? { name: "home" });
+  } catch (e) {
+    errorMessage.value = (e as Error).message;
+  } finally {
+    isSubmitting.value = false;
+  }
 };
 
 const featureCards = [
@@ -53,9 +73,11 @@ const featureCards = [
               </svg>
               <input
                 id="login-email"
+                v-model="email"
                 type="email"
                 placeholder="example@company.com"
                 autocomplete="email"
+                required
                 class="h-11 w-full rounded-lg border border-[#e5e7eb] bg-white pl-10 pr-3 text-sm text-[#1a1a1a] outline-none transition placeholder:text-[#9ca3af] focus:border-[#8cc7c4] focus:ring-2 focus:ring-[#8cc7c4]/30"
               />
             </div>
@@ -70,16 +92,30 @@ const featureCards = [
               </svg>
               <input
                 id="login-password"
+                v-model="password"
                 type="password"
                 placeholder="비밀번호를 입력하세요"
                 autocomplete="current-password"
+                required
                 class="h-11 w-full rounded-lg border border-[#e5e7eb] bg-white pl-10 pr-3 text-sm text-[#1a1a1a] outline-none transition placeholder:text-[#9ca3af] focus:border-[#8cc7c4] focus:ring-2 focus:ring-[#8cc7c4]/30"
               />
             </div>
           </div>
 
-          <button type="submit" class="mt-2 h-11 w-full rounded-lg bg-[#db1a1a] text-sm font-semibold text-white transition hover:bg-[#c01616]">
-            로그인
+          <p
+            v-if="errorMessage"
+            class="rounded-md bg-[#fef2f2] px-3 py-2 text-sm text-[#dc2626]"
+            role="alert"
+          >
+            {{ errorMessage }}
+          </p>
+
+          <button
+            type="submit"
+            :disabled="isSubmitting"
+            class="mt-2 h-11 w-full rounded-lg bg-[#db1a1a] text-sm font-semibold text-white transition hover:bg-[#c01616] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {{ isSubmitting ? "로그인 중..." : "로그인" }}
           </button>
         </form>
       </div>

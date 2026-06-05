@@ -1,13 +1,64 @@
 <script setup lang="ts">
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import { homeAssets } from "@/data/home";
+import { regionOptions } from "@/data/regions";
+import { useAuthStore } from "@/stores/auth";
+import type { Region } from "@/api/types";
 
 const router = useRouter();
+const authStore = useAuthStore();
 const go = (name: string) => router.push({ name });
 
-const handleSubmit = () => {
-  router.push({ name: "home" });
+const name = ref("");
+const phoneNumber = ref("");
+const companyName = ref("");
+const region = ref<Region | "">("");
+const email = ref("");
+const password = ref("");
+const passwordCheck = ref("");
+
+const errorMessage = ref("");
+const successMessage = ref("");
+const isSubmitting = ref(false);
+
+const handleSubmit = async () => {
+  if (isSubmitting.value) return;
+  errorMessage.value = "";
+  successMessage.value = "";
+
+  if (!region.value) {
+    errorMessage.value = "지역을 선택해주세요.";
+    return;
+  }
+  if (password.value.length < 8) {
+    errorMessage.value = "비밀번호는 8자 이상이어야 합니다.";
+    return;
+  }
+  if (password.value !== passwordCheck.value) {
+    errorMessage.value = "비밀번호가 일치하지 않습니다.";
+    return;
+  }
+
+  isSubmitting.value = true;
+  try {
+    await authStore.signup({
+      name: name.value,
+      phoneNumber: phoneNumber.value,
+      companyName: companyName.value,
+      email: email.value,
+      region: region.value,
+      password: password.value,
+      passwordCheck: passwordCheck.value,
+    });
+    successMessage.value = "회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.";
+    setTimeout(() => router.push({ name: "login" }), 1200);
+  } catch (e) {
+    errorMessage.value = (e as Error).message;
+  } finally {
+    isSubmitting.value = false;
+  }
 };
 
 const featureCards = [
@@ -57,7 +108,7 @@ const iconClass =
                   <circle cx="12" cy="8" r="4" />
                   <path d="M4 20a8 8 0 0 1 16 0" />
                 </svg>
-                <input id="signup-name" type="text" placeholder="홍길동" autocomplete="name" :class="inputClass" />
+                <input id="signup-name" v-model="name" type="text" placeholder="홍길동" autocomplete="name" required :class="inputClass" />
               </div>
             </div>
 
@@ -67,7 +118,7 @@ const iconClass =
                 <svg :class="iconClass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z" />
                 </svg>
-                <input id="signup-phone" type="tel" placeholder="010-0000-0000" autocomplete="tel" :class="inputClass" />
+                <input id="signup-phone" v-model="phoneNumber" type="tel" placeholder="010-0000-0000" autocomplete="tel" required :class="inputClass" />
               </div>
             </div>
           </div>
@@ -79,7 +130,7 @@ const iconClass =
                 <rect x="5" y="3" width="14" height="18" rx="1.5" />
                 <path d="M9 21v-4h6v4M9 7h.01M15 7h.01M9 11h.01M15 11h.01" />
               </svg>
-              <input id="signup-company" type="text" placeholder="(주)회사명" autocomplete="organization" :class="inputClass" />
+              <input id="signup-company" v-model="companyName" type="text" placeholder="(주)회사명" autocomplete="organization" required :class="inputClass" />
             </div>
           </div>
 
@@ -90,7 +141,17 @@ const iconClass =
                 <path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z" />
                 <circle cx="12" cy="10" r="2.5" />
               </svg>
-              <input id="signup-region" type="text" placeholder="서울시" :class="inputClass" />
+              <select
+                id="signup-region"
+                v-model="region"
+                required
+                :class="[inputClass, 'appearance-none pr-8']"
+              >
+                <option value="" disabled>지역을 선택하세요</option>
+                <option v-for="opt in regionOptions" :key="opt.value" :value="opt.value">
+                  {{ opt.label }}
+                </option>
+              </select>
             </div>
           </div>
 
@@ -101,7 +162,7 @@ const iconClass =
                 <rect x="3" y="5" width="18" height="14" rx="2" />
                 <path d="m3 7 9 6 9-6" />
               </svg>
-              <input id="signup-email" type="email" placeholder="example@company.com" autocomplete="email" :class="inputClass" />
+              <input id="signup-email" v-model="email" type="email" placeholder="example@company.com" autocomplete="email" required :class="inputClass" />
             </div>
           </div>
 
@@ -112,7 +173,7 @@ const iconClass =
                 <rect x="4" y="11" width="16" height="9" rx="2" />
                 <path d="M8 11V8a4 4 0 0 1 8 0v3" />
               </svg>
-              <input id="signup-password" type="password" placeholder="8자 이상" autocomplete="new-password" :class="inputClass" />
+              <input id="signup-password" v-model="password" type="password" placeholder="8자 이상" autocomplete="new-password" required minlength="8" :class="inputClass" />
             </div>
           </div>
 
@@ -123,12 +184,31 @@ const iconClass =
                 <rect x="4" y="11" width="16" height="9" rx="2" />
                 <path d="M8 11V8a4 4 0 0 1 8 0v3" />
               </svg>
-              <input id="signup-password-confirm" type="password" placeholder="비밀번호 재입력" autocomplete="new-password" :class="inputClass" />
+              <input id="signup-password-confirm" v-model="passwordCheck" type="password" placeholder="비밀번호 재입력" autocomplete="new-password" required :class="inputClass" />
             </div>
           </div>
 
-          <button type="submit" class="mt-2 h-11 w-full rounded-lg bg-[#db1a1a] text-sm font-semibold text-white transition hover:bg-[#c01616]">
-            회원가입
+          <p
+            v-if="errorMessage"
+            class="rounded-md bg-[#fef2f2] px-3 py-2 text-sm text-[#dc2626]"
+            role="alert"
+          >
+            {{ errorMessage }}
+          </p>
+          <p
+            v-if="successMessage"
+            class="rounded-md bg-[#f0fdf4] px-3 py-2 text-sm text-[#16a34a]"
+            role="status"
+          >
+            {{ successMessage }}
+          </p>
+
+          <button
+            type="submit"
+            :disabled="isSubmitting"
+            class="mt-2 h-11 w-full rounded-lg bg-[#db1a1a] text-sm font-semibold text-white transition hover:bg-[#c01616] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {{ isSubmitting ? "가입 중..." : "회원가입" }}
           </button>
         </form>
       </div>
