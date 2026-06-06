@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted, ref } from "vue";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import MyPageHero from "@/components/mypage/MyPageHero.vue";
 import MyPageSummaryCards from "@/components/mypage/MyPageSummaryCards.vue";
@@ -7,10 +7,23 @@ import MyPageTabs from "@/components/mypage/MyPageTabs.vue";
 import { homeAssets } from "@/data/home";
 import { myPageNavItems } from "@/data/mypage";
 import { useMyPageOverview } from "@/composables/useMyPageOverview";
-import type { Badge } from "@/api/mypage";
+import { myPageApi, type Badge, type BadgeSection } from "@/api/mypage";
 
-const { overview, isLoading, errorMessage, profile, reviewCount, summaryCards } =
-  useMyPageOverview();
+const { profile, reviewCount, summaryCards } = useMyPageOverview();
+
+const badgeSection = ref<BadgeSection | null>(null);
+const isLoading = ref(true);
+const errorMessage = ref("");
+
+onMounted(async () => {
+  try {
+    badgeSection.value = await myPageApi.badges();
+  } catch (e) {
+    errorMessage.value = (e as Error).message;
+  } finally {
+    isLoading.value = false;
+  }
+});
 
 // 뱃지 색 팔레트 (인덱스로 순환 적용)
 const palette = [
@@ -26,12 +39,12 @@ interface DisplayBadge extends Badge {
 }
 
 const earnedBadges = computed<DisplayBadge[]>(() => {
-  const list = overview.value?.badges?.earnedBadges ?? [];
+  const list = badgeSection.value?.earnedBadges ?? [];
   return list.map((b, i) => ({ ...b, ...palette[i % palette.length] }));
 });
 
 const inProgressBadges = computed<DisplayBadge[]>(() => {
-  const list = overview.value?.badges?.inProgressBadges ?? [];
+  const list = badgeSection.value?.inProgressBadges ?? [];
   return list.map((b, i) => ({ ...b, ...palette[i % palette.length] }));
 });
 

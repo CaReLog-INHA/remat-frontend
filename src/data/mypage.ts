@@ -1,5 +1,6 @@
 export type MyPageRoute =
   | "my-page-profile"
+  | "my-page-badges"
   | "my-page-registered-materials"
   | "my-page-activity"
   | "my-page-esg-report";
@@ -13,7 +14,7 @@ export const myPageNavItems = [
 
 export const myPageTabs = [
   { label: "프로필", page: "my-page-profile" },
+  { label: "뱃지", page: "my-page-badges" },
   { label: "내 자재", page: "my-page-registered-materials" },
   { label: "활동 내역", page: "my-page-activity" },
-  { label: "ESG 감축 리포트", page: "my-page-esg-report" },
 ] as const;
