@@ -1,11 +1,20 @@
 <script setup lang="ts">
-import { myPageSummaryCards } from "@/data/mypage";
+export interface SummaryCard {
+  label: string;
+  value: string;
+  iconSrc: string;
+  tint: string;
+}
+
+defineProps<{
+  cards: ReadonlyArray<SummaryCard>;
+}>();
 </script>
 
 <template>
   <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
     <article
-      v-for="card in myPageSummaryCards"
+      v-for="card in cards"
       :key="card.label"
       class="rounded-[14px] border border-[#e5e7eb] bg-white p-5 shadow-[0_1px_1.5px_rgba(0,0,0,0.1),0_1px_1px_rgba(0,0,0,0.08)]"
     >

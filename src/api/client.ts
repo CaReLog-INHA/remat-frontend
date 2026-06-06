@@ -19,8 +19,7 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError<{ status?: ResponseStatus }>) => {
-    // 401(인증 만료/없음), 403(권한 부족 - 백엔드가 invalid 토큰을 403으로 떨굴 수 있음)
-    if (error.response?.status === 401 || error.response?.status === 403) {
+    if (error.response?.status === 401) {
       tokenStorage.clear();
     }
 
