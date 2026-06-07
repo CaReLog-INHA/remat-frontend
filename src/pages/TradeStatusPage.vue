@@ -1,13 +1,33 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import TradeHistoryPanel from "@/components/trade-status/TradeHistoryPanel.vue";
 import TradeMaterialsPanel from "@/components/trade-status/TradeMaterialsPanel.vue";
 import TradeRequestsPanel from "@/components/trade-status/TradeRequestsPanel.vue";
+import { useMyPageOverview } from "@/composables/useMyPageOverview";
 
 type TradeTab = "materials" | "requests" | "history";
 
 const activeTab = ref<TradeTab>("materials");
+
+// 상단 통계 / ESG 섹션은 마이페이지 통합 조회(/mypage) 재사용
+const { overview } = useMyPageOverview();
+
+const sellingCount = computed(() => overview.value?.sellingMaterials?.length ?? 0);
+const totalCarbonKg = computed(() => overview.value?.esgContribution?.totalCarbonKg ?? null);
+const reuseRate = computed(() => overview.value?.esgContribution?.resourceReuseRate ?? null);
+const treeCount = computed(() => overview.value?.esgContribution?.treeCount ?? null);
+
+// 예상 수익 = 판매 중 자재 가격 합계
+const expectedRevenue = computed(() => {
+  const sum = (overview.value?.sellingMaterials ?? []).reduce((acc, m) => acc + (m.price ?? 0), 0);
+  return sum;
+});
+const revenueLabel = computed(() => {
+  const v = expectedRevenue.value;
+  if (v >= 10000) return `${Math.round(v / 10000).toLocaleString("ko-KR")}만`;
+  return v.toLocaleString("ko-KR");
+});
 
 const tabs: ReadonlyArray<{ key: TradeTab; label: string; icon: "box" | "trend" | "coin" }> = [
   { key: "materials", label: "내 자재", icon: "box" },
@@ -31,21 +51,21 @@ const tabs: ReadonlyArray<{ key: TradeTab; label: string; icon: "box" | "trend" 
             <div class="grid size-12 place-items-center rounded-[10px] bg-[#db1a1a]/10">
               <img src="/figma-icons/registered-materials.svg" alt="" class="size-6 object-contain" />
             </div>
-            <p class="mt-3 text-3xl font-bold">3</p>
+            <p class="mt-3 text-3xl font-bold">{{ sellingCount }}</p>
             <p class="mt-1 text-sm text-[#4a5565]">등록한 자재</p>
           </article>
           <article class="rounded-[14px] border-l-4 border-[#00c950] bg-white p-6 shadow-sm">
             <div class="grid size-12 place-items-center rounded-[10px] bg-[#f0fdf4]">
               <img src="/figma-icons/stat-carbon.svg" alt="" class="size-6 object-contain" />
             </div>
-            <p class="mt-3 text-3xl font-bold">220kg</p>
+            <p class="mt-3 text-3xl font-bold">{{ totalCarbonKg != null ? `${totalCarbonKg}kg` : "—" }}</p>
             <p class="mt-1 text-sm text-[#4a5565]">탄소 절감</p>
           </article>
           <article class="rounded-[14px] border-l-4 border-[#2b7fff] bg-white p-6 shadow-sm">
             <div class="grid size-12 place-items-center rounded-[10px] bg-[#eff6ff] text-[#155dfc]">
               <span class="text-lg font-bold">$</span>
             </div>
-            <p class="mt-3 text-3xl font-bold">134만</p>
+            <p class="mt-3 text-3xl font-bold">{{ revenueLabel }}</p>
             <p class="mt-1 text-sm text-[#4a5565]">예상 수익</p>
           </article>
         </div>
@@ -90,12 +110,12 @@ const tabs: ReadonlyArray<{ key: TradeTab; label: string; icon: "box" | "trend" 
           <div class="mt-4 grid gap-4 md:grid-cols-2">
             <div class="rounded-[8px] bg-white p-4">
               <p class="text-sm text-[#4a5565]">총 탄소 절감량</p>
-              <p class="mt-1 text-3xl font-bold text-[#00a63e]">220kg</p>
-              <p class="mt-1 text-xs text-[#6a7282]">나무 33그루 식재 효과</p>
+              <p class="mt-1 text-3xl font-bold text-[#00a63e]">{{ totalCarbonKg != null ? `${totalCarbonKg}kg` : "—" }}</p>
+              <p class="mt-1 text-xs text-[#6a7282]">나무 {{ treeCount ?? "—" }}그루 식재 효과</p>
             </div>
             <div class="rounded-[8px] bg-white p-4">
               <p class="text-sm text-[#4a5565]">자원 재사용률</p>
-              <p class="mt-1 text-3xl font-bold text-[#2b7fff]">100%</p>
+              <p class="mt-1 text-3xl font-bold text-[#2b7fff]">{{ reuseRate != null ? `${reuseRate}%` : "—" }}</p>
               <p class="mt-1 text-xs text-[#6a7282]">폐기물 제로 달성</p>
             </div>
           </div>

@@ -1,17 +1,26 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
+defineProps<{
+  submitting?: boolean;
+}>();
+
 const emit = defineEmits<{
   (event: "close"): void;
-  (event: "submit", payload: { rating: number; content: string }): void;
+  (event: "submit", payload: { starRating: number; description: string }): void;
 }>();
 
 const rating = ref(5);
 const content = ref("");
+const error = ref("");
 
 const submitReview = () => {
-  emit("submit", { rating: rating.value, content: content.value });
-  emit("close");
+  if (!content.value.trim()) {
+    error.value = "후기 내용을 입력해주세요.";
+    return;
+  }
+  error.value = "";
+  emit("submit", { starRating: rating.value, description: content.value.trim() });
 };
 </script>
 
@@ -22,7 +31,7 @@ const submitReview = () => {
         type="button"
         class="absolute right-4 top-4 grid size-6 place-items-center rounded-[4px] text-[#4a5565] opacity-70 transition hover:bg-black/5 hover:opacity-100"
         aria-label="리뷰 모달 닫기"
-        @click="$emit('close')"
+        @click="emit('close')"
       >
         <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M18 6 6 18M6 6l12 12" stroke-linecap="round" />
@@ -62,18 +71,23 @@ const submitReview = () => {
             placeholder="거래 경험을 자세히 공유해주세요&#10;(예: 자재 상태, 배송, 판매자 응대 등)"
           />
         </label>
+
+        <p v-if="error" class="rounded-md bg-[#fef2f2] px-3 py-2 text-sm text-[#dc2626]" role="alert">
+          {{ error }}
+        </p>
       </div>
 
       <footer class="mt-10 grid gap-3 sm:grid-cols-2">
-        <button type="button" class="h-9 rounded-[8px] border border-black/10 bg-[#fff6f6] text-sm font-medium text-[#1a1a1a] transition hover:bg-white" @click="$emit('close')">
+        <button type="button" :disabled="submitting" class="h-9 rounded-[8px] border border-black/10 bg-[#fff6f6] text-sm font-medium text-[#1a1a1a] transition hover:bg-white disabled:opacity-60" @click="emit('close')">
           취소
         </button>
         <button
           type="button"
-          class="h-9 rounded-[8px] bg-[linear-gradient(90deg,#8cc7c4_0%,#2c687b_100%)] text-sm font-medium text-white transition hover:brightness-95"
+          :disabled="submitting"
+          class="h-9 rounded-[8px] bg-[linear-gradient(90deg,#8cc7c4_0%,#2c687b_100%)] text-sm font-medium text-white transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
           @click="submitReview"
         >
-          리뷰 등록
+          {{ submitting ? "등록 중..." : "리뷰 등록" }}
         </button>
       </footer>
     </section>
