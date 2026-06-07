@@ -1,6 +1,5 @@
 import figmaLogoIcon from "@/assets/figma-logo-icon-original.svg";
 import figmaMascot from "@/assets/figma-mascot-original.svg";
-import { materials } from "@/data/materials";
 
 export const homeAssets = {
   logoIcon: figmaLogoIcon,
@@ -40,19 +39,6 @@ export const valueCards = [
     icon: "M5 19V5M9 19v-8M13 19V8M17 19v-5M21 19H3",
   },
 ] as const;
-
-export const materialCards = materials.slice(0, 3).map((item) => ({
-  id: item.id,
-  tradeType: item.tradeType,
-  image: item.image,
-  category: item.category,
-  status: item.condition,
-  title: item.title,
-  desc: item.desc,
-  price: item.priceLabel,
-  stock: item.stockLabel,
-  carbon: item.carbon,
-}));
 
 export const footerLinks = {
   service: ["자재 마켓", "AI 분석", "자재 등록", "대시보드"],
