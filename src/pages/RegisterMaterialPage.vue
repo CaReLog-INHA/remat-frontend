@@ -103,7 +103,7 @@ const selectClass =
 
 <template>
   <DefaultLayout active-page="register-material">
-    <section class="bg-[linear-gradient(90deg,#2c687b_0%,#8cc7c4_50%,#2c687b_100%)] py-12 text-white">
+    <section class="bg-[linear-gradient(90deg,#2c687b_0%,rgba(44,104,123,0.9)_100%)] py-12 text-white">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <h1 class="text-4xl font-bold">자재 등록하기</h1>
         <p class="mt-3 text-lg text-white/80">사용이 끝난 자재를 등록하고 새로운 수요자와 연결해보세요.</p>

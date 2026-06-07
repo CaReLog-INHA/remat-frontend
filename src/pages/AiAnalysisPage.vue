@@ -1,10 +1,74 @@
 <script setup lang="ts">
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import { homeAssets } from "@/data/home";
+import { useAiAnalysisStore } from "@/stores/aiAnalysis";
+import iconCheckCircle from "@/assets/ai-benefit-check-circle.svg";
+import iconSparkles from "@/assets/ai-benefit-sparkles.svg";
+import iconFileText from "@/assets/ai-benefit-file-text.svg";
 
 const router = useRouter();
-const go = (name: string) => router.push({ name });
+const aiStore = useAiAnalysisStore();
+
+const fileInput = ref<HTMLInputElement | null>(null);
+const selectedFile = ref<File | null>(null);
+const isDragOver = ref(false);
+const isAnalyzing = ref(false);
+const errorMessage = ref("");
+
+const MAX_SIZE = 50 * 1024 * 1024; // 50MB
+
+const pickFile = (file: File): string | null => {
+  if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+    return "PDF 파일만 업로드할 수 있습니다.";
+  }
+  if (file.size > MAX_SIZE) {
+    return "파일 크기는 최대 50MB까지 업로드할 수 있습니다.";
+  }
+  return null;
+};
+
+const setFile = (file: File) => {
+  const error = pickFile(file);
+  if (error) {
+    errorMessage.value = error;
+    return;
+  }
+  errorMessage.value = "";
+  selectedFile.value = file;
+};
+
+const onFileChange = (e: Event) => {
+  const target = e.target as HTMLInputElement;
+  const file = target.files?.[0];
+  if (file) setFile(file);
+};
+
+const onDrop = (e: DragEvent) => {
+  e.preventDefault();
+  isDragOver.value = false;
+  const file = e.dataTransfer?.files?.[0];
+  if (file) setFile(file);
+};
+
+const openFileDialog = () => {
+  fileInput.value?.click();
+};
+
+const analyze = async () => {
+  if (!selectedFile.value || isAnalyzing.value) return;
+  isAnalyzing.value = true;
+  errorMessage.value = "";
+  try {
+    await aiStore.analyze(selectedFile.value);
+    router.push({ name: "ai-analysis-result" });
+  } catch (e) {
+    errorMessage.value = (e as Error).message;
+  } finally {
+    isAnalyzing.value = false;
+  }
+};
 
 const steps = [
   {
@@ -37,7 +101,7 @@ const benefitCards = [
   {
     title: "정확한 자재 식별",
     desc: "AI가 기획서 내용을 분석하여 필요한 자재의 종류, 수량, 규격을 정확하게 파악합니다.",
-    icon: "✓",
+    iconSrc: iconCheckCircle,
     bg: "bg-[#dcfce7]",
     iconBg: "bg-[#16a34a]",
     titleColor: "text-[#166534]",
@@ -45,7 +109,7 @@ const benefitCards = [
   {
     title: "스마트 매칭",
     desc: "등록된 자재 풀 중 조건이 맞는 후보를 빠르게 찾아 자재를 자동으로 추천합니다.",
-    icon: "↗",
+    iconSrc: iconSparkles,
     bg: "bg-[#dbeafe]",
     iconBg: "bg-[#2563eb]",
     titleColor: "text-[#1d4ed8]",
@@ -53,7 +117,7 @@ const benefitCards = [
   {
     title: "상세 분석 리포트",
     desc: "일치도와 자재 적합도 항목별 분석 내용을 제공해 상세한 분석 리포트를 제공합니다.",
-    icon: "▣",
+    iconSrc: iconFileText,
     bg: "bg-[#f3e8ff]",
     iconBg: "bg-[#9333ea]",
     titleColor: "text-[#7e22ce]",
@@ -61,7 +125,7 @@ const benefitCards = [
   {
     title: "대체 자재 제안",
     desc: "원하는 자재가 없더라도 유사하거나 대체 가능한 자재를 추천하여 선택의 폭을 넓혀드립니다.",
-    icon: "◎",
+    iconSrc: iconCheckCircle,
     bg: "bg-[#ffedd5]",
     iconBg: "bg-[#f97316]",
     titleColor: "text-[#c2410c]",
@@ -71,19 +135,10 @@ const benefitCards = [
 
 <template>
   <DefaultLayout active-page="ai-analysis">
-      <section class="relative overflow-hidden bg-[linear-gradient(90deg,#2f6f82_0%,#7bb7bd_100%)] text-white">
-        <div class="absolute inset-y-0 right-0 w-1/3 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.16),transparent_70%)]" aria-hidden="true" />
-        <div class="mx-auto flex max-w-7xl items-center justify-between gap-8 px-4 py-10 sm:px-6 lg:px-8">
-          <div>
-            <div class="flex items-center gap-3">
-              <div class="grid size-10 place-items-center rounded-xl bg-white/14 ring-1 ring-white/18 backdrop-blur-sm">
-                <span class="text-sm font-bold">AI</span>
-              </div>
-              <h1 class="text-[32px] font-bold tracking-[-0.03em]">AI 자재 분석</h1>
-            </div>
-            <p class="mt-3 text-sm text-white/85 sm:text-base">기획서를 업로드하면 AI가 필요한 자재를 자동으로 분석하고 추천해드립니다</p>
-          </div>
-          <img :src="homeAssets.mascot" alt="" class="hidden w-20 opacity-70 md:block" />
+      <section class="bg-[linear-gradient(90deg,#2c687b_0%,rgba(44,104,123,0.9)_100%)] py-12 text-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <h1 class="text-4xl font-bold">AI 자재 분석</h1>
+          <p class="mt-3 text-lg text-white/80">기획서를 업로드하면 AI가 필요한 자재를 자동으로 분석하고 추천해드립니다</p>
         </div>
       </section>
 
@@ -107,21 +162,51 @@ const benefitCards = [
         <section class="mt-12 rounded-[22px] border border-white/70 bg-white px-5 py-6 shadow-[0_18px_44px_rgba(15,23,42,0.10)] sm:px-8 sm:py-8">
           <div class="flex items-center justify-between gap-4">
             <h3 class="text-lg font-bold text-[#111827]">기획서 업로드</h3>
-            <span class="rounded-full bg-[#f1f5f9] px-3 py-1 text-xs font-semibold text-[#64748b]">샘플 흐름</span>
+            <span class="rounded-full bg-[#f1f5f9] px-3 py-1 text-xs font-semibold text-[#64748b]">PDF · 최대 50MB</span>
           </div>
 
-          <div class="mt-5 rounded-[20px] border border-dashed border-[#d8dee9] bg-[#fdfefe] px-6 py-12 text-center">
-            <img :src="homeAssets.mascot" alt="" class="mx-auto max-w-[72px]" />
-            <p class="mt-5 text-base font-semibold text-[#374151]">PDF 파일을 드래그하거나 클릭하여 업로드</p>
-            <p class="mt-2 text-sm text-[#9ca3af]">최대 50MB까지 업로드 가능합니다</p>
+          <div
+            :class="[
+              'mt-5 rounded-[20px] border border-dashed px-6 py-12 text-center transition',
+              isDragOver ? 'border-[#2c687b] bg-[#f0fafa]' : 'border-[#d8dee9] bg-[#fdfefe]',
+            ]"
+            @dragover.prevent="isDragOver = true"
+            @dragleave.prevent="isDragOver = false"
+            @drop="onDrop"
+          >
+            <input
+              ref="fileInput"
+              type="file"
+              accept="application/pdf,.pdf"
+              class="sr-only"
+              @change="onFileChange"
+            />
+            <img :src="homeAssets.mascot" alt="" class="mx-auto size-[72px] object-contain" />
+            <p v-if="!selectedFile" class="mt-5 text-base font-semibold text-[#374151]">PDF 파일을 드래그하거나 클릭하여 업로드</p>
+            <p v-else class="mt-5 text-base font-semibold text-[#0f766e]">{{ selectedFile.name }}</p>
+            <p class="mt-2 text-sm text-[#9ca3af]">
+              {{ selectedFile ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)}MB` : "최대 50MB까지 업로드 가능합니다" }}
+            </p>
             <div class="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <button type="button" class="inline-flex h-10 items-center justify-center rounded-lg border border-[#d6dbe4] bg-white px-5 text-sm font-semibold text-[#475569] transition hover:border-[#8cc7c4]" @click="go('ai-analysis-result')">
-                샘플 결과 보기
+              <button
+                type="button"
+                class="inline-flex h-10 items-center justify-center rounded-lg border border-[#d6dbe4] bg-white px-5 text-sm font-semibold text-[#475569] transition hover:border-[#8cc7c4] disabled:cursor-not-allowed disabled:opacity-60"
+                :disabled="isAnalyzing"
+                @click="openFileDialog"
+              >
+                {{ selectedFile ? "다른 파일 선택" : "파일 선택하기" }}
               </button>
-              <button type="button" class="inline-flex h-10 items-center justify-center rounded-lg bg-[#ef4444] px-5 text-sm font-semibold text-white transition hover:bg-[#dc2626]" @click="go('ai-analysis-result')">
-                파일 선택하기
+              <button
+                v-if="selectedFile"
+                type="button"
+                class="inline-flex h-10 items-center justify-center rounded-lg bg-[#ef4444] px-5 text-sm font-semibold text-white transition hover:bg-[#dc2626] disabled:cursor-not-allowed disabled:opacity-60"
+                :disabled="isAnalyzing"
+                @click="analyze"
+              >
+                {{ isAnalyzing ? "분석 중..." : "AI 분석 시작" }}
               </button>
             </div>
+            <p v-if="errorMessage" class="mt-4 text-sm text-[#dc2626]" role="alert">{{ errorMessage }}</p>
           </div>
         </section>
 
@@ -132,8 +217,8 @@ const benefitCards = [
             :class="[card.bg, 'rounded-2xl border border-white/60 px-5 py-5 shadow-[0_8px_24px_rgba(15,23,42,0.04)]']"
           >
             <div class="flex items-start gap-4">
-              <div :class="[card.iconBg, 'grid size-10 shrink-0 place-items-center rounded-xl text-sm font-bold text-white shadow-sm']">
-                {{ card.icon }}
+              <div :class="[card.iconBg, 'grid size-10 shrink-0 place-items-center rounded-xl shadow-sm']">
+                <img :src="card.iconSrc" alt="" class="size-6" />
               </div>
               <div>
                 <h3 :class="[card.titleColor, 'text-base font-bold']">{{ card.title }}</h3>
