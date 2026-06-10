@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
-import { categoryGroups, findCategory } from "@/data/categories";
 import { conditionOptions, transactionOptions } from "@/data/materialOptions";
 import { regionOptions } from "@/data/regions";
 import { materialsApi } from "@/api/materials";
+import { useCategories } from "@/composables/useCategories";
 import type { MaterialCondition, Region, TransactionType } from "@/api/types";
 
 const router = useRouter();
+
+const { categories } = useCategories();
 
 // 폼 상태
 const imageFile = ref<File | null>(null);
@@ -38,14 +40,6 @@ const onFileChange = (e: Event) => {
   imagePreview.value = URL.createObjectURL(file);
   errorMessage.value = "";
 };
-
-// 예상 탄소 절감 = 평균무게(kg) × esgEffect(g/kg) ÷ 1000 × 수량
-const estimatedCarbon = computed(() => {
-  const cat = categoryName.value ? findCategory(categoryName.value) : undefined;
-  if (!cat || !quantity.value) return null;
-  const perItemKg = (cat.avgWeightKg * cat.esgEffect) / 1000;
-  return Math.round(perItemKg * quantity.value);
-});
 
 const validate = (): string | null => {
   if (!imageFile.value) return "자재 사진을 업로드해주세요.";
@@ -148,9 +142,7 @@ const selectClass =
               <label class="text-sm font-medium text-[#1a1a1a]">카테고리 *</label>
               <select v-model="categoryName" :class="selectClass">
                 <option value="">카테고리 선택</option>
-                <optgroup v-for="grp in categoryGroups" :key="grp.group" :label="grp.group">
-                  <option v-for="cat in grp.items" :key="cat.key" :value="cat.value">{{ cat.value }}</option>
-                </optgroup>
+                <option v-for="cat in categories" :key="cat.id" :value="cat.displayName">{{ cat.displayName }}</option>
               </select>
             </div>
             <div class="space-y-2">
@@ -215,11 +207,10 @@ const selectClass =
           <svg class="size-5 text-[#008236]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 16c-6 2-12-1-16-8c6-2 12 1 16 8ZM4 8c0 7 5 11 12 11" stroke-linecap="round" stroke-linejoin="round" /></svg>
           예상 ESG 효과
         </h2>
-        <p class="mt-4 text-sm text-[#1a1a1a]">등록한 자재가 재사용되면 다음과 같은 환경 효과를 기대할 수 있습니다.</p>
+        <p class="mt-4 text-sm text-[#1a1a1a]">등록한 자재가 재사용되면 탄소 절감 등 환경 효과를 기대할 수 있습니다.</p>
         <div class="mt-4 rounded-[12px] bg-white p-4">
           <p class="text-sm text-[#4a5565]">예상 탄소 절감</p>
-          <p v-if="estimatedCarbon != null" class="mt-1 text-2xl font-bold text-[#008236]">~{{ estimatedCarbon.toLocaleString("ko-KR") }}kg CO2</p>
-          <p v-else class="mt-1 text-sm text-[#99a1af]">카테고리와 수량을 입력하면 예상치가 계산됩니다.</p>
+          <p class="mt-1 text-sm text-[#99a1af]">등록 완료 후 카테고리 기준으로 자동 산정됩니다.</p>
         </div>
       </section>
 

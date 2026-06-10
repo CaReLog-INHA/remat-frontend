@@ -4,7 +4,6 @@ import { useRouter } from "vue-router";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import { homeAssets } from "@/data/home";
 import { regionOptions } from "@/data/regions";
-import { categoryGroups } from "@/data/categories";
 import {
   conditionOptions,
   transactionOptions,
@@ -12,9 +11,12 @@ import {
   transactionLabel,
 } from "@/data/materialOptions";
 import { materialsApi, type MaterialListItem } from "@/api/materials";
+import { useCategories } from "@/composables/useCategories";
 import type { MaterialCondition, Region, TransactionType } from "@/api/types";
 
 const router = useRouter();
+
+const { categories } = useCategories();
 
 const materials = ref<MaterialListItem[]>([]);
 const isLoading = ref(true);
@@ -125,9 +127,7 @@ const selectClass =
             <label class="block text-sm font-medium text-[#364153]">카테고리</label>
             <select v-model="selectedCategory" :class="selectClass">
               <option value="">전체</option>
-              <optgroup v-for="grp in categoryGroups" :key="grp.group" :label="grp.group">
-                <option v-for="cat in grp.items" :key="cat.key" :value="cat.value">{{ cat.value }}</option>
-              </optgroup>
+              <option v-for="cat in categories" :key="cat.id" :value="cat.displayName">{{ cat.displayName }}</option>
             </select>
           </div>
 

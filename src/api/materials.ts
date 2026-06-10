@@ -74,9 +74,24 @@ export interface MaterialListFilters {
   region?: Region;
 }
 
+export interface CategoryItem {
+  id: number;
+  categoryName: string;
+  displayName: string;
+}
+
+interface CategoryListRes {
+  categories: CategoryItem[];
+}
+
 export const materialsApi = {
   list: (filters?: MaterialListFilters): Promise<MaterialListItem[]> =>
     http.get<MaterialListItem[]>("/materials", { params: filters }),
+
+categories: async (): Promise<CategoryItem[]> => {
+    const res = await http.get<CategoryListRes>("/materials/categories");
+    return res.categories;
+  },
 
   detail: (materialId: number): Promise<MaterialDetail> =>
     http.get<MaterialDetail>(`/materials/${materialId}`),
