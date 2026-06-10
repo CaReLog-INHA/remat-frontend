@@ -2,7 +2,7 @@
 import ValueCard from "./ValueCard.vue";
 
 defineProps<{
-  values: Array<{ title: string; desc: string; tone: string; icon: string }>;
+  values: ReadonlyArray<{ title: string; desc: string; tone: string; icon: string }>;
 }>();
 </script>
 

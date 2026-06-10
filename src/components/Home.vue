@@ -1,41 +1,36 @@
 <script setup lang="ts">
+import { onMounted, ref } from "vue";
+import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import CtaSection from "./home/CtaSection.vue";
 import HeroSection from "./home/HeroSection.vue";
 import MaterialsSection from "./home/MaterialsSection.vue";
-import SiteFooter from "./home/SiteFooter.vue";
-import SiteHeader from "./home/SiteHeader.vue";
 import ValuesSection from "./home/ValuesSection.vue";
-import { footerLinks, heroStats, homeAssets, materialCards, navItems, valueCards } from "@/data/home";
+import { heroStats, homeAssets, valueCards } from "@/data/home";
+import { materialsApi, type MaterialListItem } from "@/api/materials";
 
-defineEmits<{
-  (event: "change-page", pageName: "home" | "login" | "signup"): void;
-}>();
+// 홈 "최근 등록된 자재" 섹션 — 자재 목록 API에서 최신 3건
+const recentMaterials = ref<MaterialListItem[]>([]);
+
+onMounted(async () => {
+  try {
+    const list = await materialsApi.list();
+    recentMaterials.value = [...list]
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 3);
+  } catch {
+    recentMaterials.value = [];
+  }
+});
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#fff6f6] text-[#101828]">
-    <SiteHeader
-      :logo-icon-src="homeAssets.logoIcon"
-      :nav-items="navItems"
-      @change-page="$emit('change-page', $event)"
-    />
-
-    <main class="pt-16">
-      <HeroSection
-        :mascot-src="homeAssets.mascot"
-        :stats="heroStats"
-        @change-page="$emit('change-page', $event)"
-      />
-      <ValuesSection :values="valueCards" />
-      <MaterialsSection :materials="materialCards" />
-      <CtaSection @change-page="$emit('change-page', $event)" />
-    </main>
-
-    <SiteFooter
-      :logo-icon-src="homeAssets.logoIcon"
+  <DefaultLayout>
+    <HeroSection
       :mascot-src="homeAssets.mascot"
-      :service-links="footerLinks.service"
-      :support-links="footerLinks.support"
+      :stats="heroStats"
     />
-  </div>
+    <ValuesSection :values="valueCards" />
+    <MaterialsSection :materials="recentMaterials" />
+    <CtaSection />
+  </DefaultLayout>
 </template>

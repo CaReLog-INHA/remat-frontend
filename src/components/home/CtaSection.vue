@@ -1,7 +1,7 @@
 <script setup lang="ts">
-defineEmits<{
-  (event: "change-page", pageName: "home" | "login" | "signup"): void;
-}>();
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 </script>
 
 <template>
@@ -17,9 +17,9 @@ defineEmits<{
         <button
           type="button"
           class="inline-flex h-10 items-center rounded-[8px] bg-[#db1a1a] px-4 text-sm font-semibold text-white transition hover:bg-[#c01616]"
-          @click="$emit('change-page', 'signup')"
+          @click="router.push({ name: 'register-material' })"
         >
-          회원가입하기
+          자재 등록하기
         </button>
         <a href="#materials" class="inline-flex h-10 items-center rounded-[8px] border border-white px-4 text-sm font-semibold text-white transition hover:bg-white/10">
           둘러보기
