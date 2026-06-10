@@ -28,6 +28,7 @@ export interface MaterialDetail {
   imageUrl: string;
   categoryName: string;
   esgEffect: number;
+  carbonReductionKg: number;
   region: string;
   sellerName: string;
   companyName: string;
@@ -88,7 +89,7 @@ export const materialsApi = {
   list: (filters?: MaterialListFilters): Promise<MaterialListItem[]> =>
     http.get<MaterialListItem[]>("/materials", { params: filters }),
 
-categories: async (): Promise<CategoryItem[]> => {
+  categories: async (): Promise<CategoryItem[]> => {
     const res = await http.get<CategoryListRes>("/materials/categories");
     return res.categories;
   },

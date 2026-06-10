@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
@@ -68,10 +68,15 @@ const estimatedPrice = computed(() => {
   return `${(price * quantity.value * rentalDays.value).toLocaleString("ko-KR")}원`;
 });
 
-// 탄소 절감은 재사용 효과라 기간이 아니라 수량 기준
 const estimatedCarbon = computed(() => {
-  const perUnit = material.value?.esgEffect ?? 0;
+  const perUnit = material.value?.carbonReductionKg ?? null;
+  if (perUnit == null) return "—";
   return `${(perUnit * quantity.value).toLocaleString("ko-KR")}kg CO₂`;
+});
+
+const unitCarbon = computed(() => {
+  const v = material.value?.carbonReductionKg ?? null;
+  return v == null ? "—" : `${v.toLocaleString("ko-KR")}kg CO₂`;
 });
 
 const goBack = () => {
@@ -172,6 +177,22 @@ const submitRentalRequest = async () => {
               <div><p class="text-xs text-[#6a7282]">등록일</p><p class="mt-1 text-base font-semibold text-[#101828]">{{ formatDate(material.createdAt) }}</p></div>
             </div>
             <div class="mt-6"><h2 class="text-lg font-semibold">상세 설명</h2><p class="mt-3 whitespace-pre-line text-sm text-[#475569]">{{ material.description }}</p></div>
+
+            <div class="mt-6 border-t border-[#e5e7eb] pt-6">
+              <h2 class="text-lg font-semibold">ESG 효과</h2>
+              <div class="mt-4 rounded-[10px] border border-[#b9f8cf] bg-[#f0fdf4] p-4">
+                <div class="flex items-center gap-3">
+                  <div class="grid size-10 shrink-0 place-items-center rounded-[10px] bg-[#dcfce7]">
+                    <img src="/figma-icons/esg-leaf.svg" alt="" class="size-5 object-contain" />
+                  </div>
+                  <div>
+                    <p class="text-sm text-[#4a5565]">탄소 절감량</p>
+                    <p class="text-2xl font-bold text-[#008236]">{{ unitCarbon }}</p>
+                  </div>
+                </div>
+                <p class="mt-2 text-xs text-[#4a5565]">신규 자재 대비 탄소 배출 감소</p>
+              </div>
+            </div>
           </article>
         </section>
 
