@@ -19,4 +19,4 @@ export type MaterialCondition = "BEST" | "GOOD" | "NORMAL";
 
 export type TransactionType = "SALE" | "RENTAL";
 
-export type TradeRequestStatus = "PENDING" | "APPROVED" | "REJECTED" | "CANCELED";
+export type TradeRequestStatus = "PENDING" | "ACCEPTED" | "REJECTED";

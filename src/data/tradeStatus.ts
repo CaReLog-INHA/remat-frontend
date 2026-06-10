@@ -4,14 +4,11 @@ import { transactionLabel } from "./materialOptions";
 
 export { transactionLabel };
 
-/** 거래 요청 상태 코드 → 한글 라벨 */
 export const requestStatusLabel = (status?: string): string =>
   (({
     PENDING: "대기 중",
-    APPROVED: "승인됨",
+    ACCEPTED: "승인됨",
     REJECTED: "거절됨",
-    CANCELED: "취소됨",
-    COMPLETED: "완료됨",
   }) as Record<string, string>)[status ?? ""] ?? (status || "—");
 
 export const formatPrice = (n?: number | null): string =>
