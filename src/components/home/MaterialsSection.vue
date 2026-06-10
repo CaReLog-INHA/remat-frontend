@@ -2,31 +2,18 @@
 import { useRouter } from "vue-router";
 import IconPath from "./IconPath.vue";
 import MaterialCard from "./MaterialCard.vue";
-import type { TradeType } from "@/data/materials";
-
-type HomeMaterial = {
-  id: string;
-  tradeType: TradeType;
-  image: string;
-  category: string;
-  status: string;
-  title: string;
-  desc: string;
-  price: string;
-  stock: string;
-  carbon: string;
-};
+import type { MaterialListItem } from "@/api/materials";
 
 defineProps<{
-  materials: ReadonlyArray<HomeMaterial>;
+  materials: ReadonlyArray<MaterialListItem>;
 }>();
 
 const router = useRouter();
 
-const goToDetail = (material: HomeMaterial) => {
+const goToDetail = (material: MaterialListItem) => {
   router.push({
-    name: material.tradeType === "sale" ? "material-detail" : "material-rental-detail",
-    params: { id: material.id },
+    name: material.transactionType === "RENTAL" ? "material-rental-detail" : "material-detail",
+    params: { id: String(material.id) },
   });
 };
 
@@ -51,15 +38,21 @@ const goToMarketplace = () => router.push({ name: "marketplace" });
         </button>
       </div>
 
-      <div class="mt-10 grid gap-8 md:grid-cols-3">
+      <div v-if="materials.length" class="mt-10 grid gap-8 md:grid-cols-3">
         <MaterialCard
           v-for="material in materials"
           :key="material.id"
-          v-bind="material"
+          :material="material"
           class="cursor-pointer"
           @click="goToDetail(material)"
         />
       </div>
+      <p
+        v-else
+        class="mt-10 rounded-[14px] border border-dashed border-[#e5e7eb] bg-white/60 p-10 text-center text-sm text-[#6a7282]"
+      >
+        아직 등록된 자재가 없습니다.
+      </p>
     </div>
   </section>
 </template>

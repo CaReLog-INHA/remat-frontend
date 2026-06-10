@@ -1,9 +1,33 @@
 <script setup lang="ts">
-import { myPageProfile } from "@/data/mypage";
+import { computed } from "vue";
+import type { Profile } from "@/api/mypage";
+import { regionOptions } from "@/data/regions";
 
-defineProps<{
+const props = defineProps<{
   mascotSrc: string;
+  profile?: Profile | null;
+  reviewCount?: number;
 }>();
+
+const regionLabel = computed(() => {
+  if (!props.profile?.region) return "—";
+  const opt = regionOptions.find((r) => r.value === props.profile!.region);
+  return opt?.label ?? props.profile.region;
+});
+
+const ratingText = computed(() => {
+  const rating = props.profile?.starRating;
+  return rating != null ? rating.toFixed(1) : "—";
+});
+
+const reviewLabel = computed(() =>
+  props.reviewCount != null ? `${props.reviewCount}개 리뷰` : "리뷰 정보 없음",
+);
+
+const fullStars = computed(() => {
+  const rating = props.profile?.starRating;
+  return rating != null ? Math.min(5, Math.max(0, Math.round(rating))) : 0;
+});
 </script>
 
 <template>
@@ -15,19 +39,18 @@ defineProps<{
         </div>
         <div class="text-white">
           <div class="flex flex-wrap items-center gap-3">
-            <h1 class="text-[36px] font-bold leading-none">{{ myPageProfile.name }}</h1>
+            <h1 class="text-[36px] font-bold leading-none">{{ profile?.name ?? "—" }}</h1>
             <div class="flex items-center gap-2 text-sm text-white/80">
-              <div class="flex text-[#ffd84d]">
-                <span v-for="star in 4" :key="star">★</span>
+              <div class="flex text-[#ffd84d]" aria-label="별점">
+                <span v-for="i in 5" :key="i">{{ i <= fullStars ? "★" : "☆" }}</span>
               </div>
-              <span>{{ myPageProfile.rating }}</span>
-              <span>({{ myPageProfile.reviewCount }})</span>
+              <span>{{ ratingText }}</span>
+              <span>({{ reviewLabel }})</span>
             </div>
           </div>
           <div class="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-white/85">
-            <span>회사 {{ myPageProfile.company }}</span>
-            <span>지역 {{ myPageProfile.location }}</span>
-            <span>가입일 {{ myPageProfile.joinedAt }}</span>
+            <span>회사 {{ profile?.companyName ?? "—" }}</span>
+            <span>지역 {{ regionLabel }}</span>
           </div>
         </div>
       </div>

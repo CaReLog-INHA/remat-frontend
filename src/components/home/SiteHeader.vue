@@ -1,21 +1,34 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { useRouter } from "vue-router";
 import type { PageName } from "@/types/navigation";
+import { useAuthStore } from "@/stores/auth";
 import RematLogo from "./RematLogo.vue";
 
-withDefaults(
-  defineProps<{
-    logoIconSrc: string;
-    navItems: ReadonlyArray<{ label: string; iconSrc: string; page?: PageName; active?: boolean }>;
-    accountVariant?: "guest" | "member";
-  }>(),
-  {
-    accountVariant: "guest",
-  },
-);
+const props = defineProps<{
+  logoIconSrc: string;
+  navItems: ReadonlyArray<{ label: string; iconSrc: string; page?: PageName; active?: boolean }>;
+  /**
+   * 헤더 우측 계정 영역 표시 방식.
+   * - 명시적으로 넘기면 그 값을 사용 (예: 로그인 페이지에서 강제 guest)
+   * - 생략하면 auth 스토어의 로그인 상태를 보고 자동 결정
+   */
+  accountVariant?: "guest" | "member";
+}>();
 
 const router = useRouter();
+const authStore = useAuthStore();
+
+const effectiveVariant = computed<"guest" | "member">(() =>
+  props.accountVariant ?? (authStore.isAuthenticated ? "member" : "guest"),
+);
+
 const go = (name: PageName) => router.push({ name });
+
+const handleLogout = () => {
+  authStore.logout();
+  router.push({ name: "login" });
+};
 </script>
 
 <template>
@@ -42,7 +55,7 @@ const go = (name: PageName) => router.push({ name });
       </nav>
 
       <div class="flex items-center gap-2">
-        <template v-if="accountVariant === 'member'">
+        <template v-if="effectiveVariant === 'member'">
           <button
             type="button"
             class="hidden h-8 items-center gap-2 rounded-[8px] border border-black/10 bg-[#fff6f6] px-3 text-sm font-medium text-[#1a1a1a] transition hover:border-[#8cc7c4] sm:flex"
@@ -54,7 +67,7 @@ const go = (name: PageName) => router.push({ name });
           <button
             type="button"
             class="h-8 rounded-[8px] border border-black/10 bg-[#fff6f6] px-3 text-sm font-medium text-[#1a1a1a] transition hover:border-[#db1a1a]/40"
-            @click="go('login')"
+            @click="handleLogout"
           >
             로그아웃
           </button>

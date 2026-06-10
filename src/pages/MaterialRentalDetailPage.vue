@@ -1,47 +1,59 @@
 ﻿<script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
-import { materials, type MaterialItem } from "@/data/materials";
+import { regionOptions } from "@/data/regions";
+import { conditionLabel as conditionLabelOf } from "@/data/materialOptions";
+import { materialsApi, type MaterialDetail } from "@/api/materials";
+import { tradesApi } from "@/api/trades";
 
 const props = defineProps<{
   id: string;
 }>();
 
 const router = useRouter();
+
+const material = ref<MaterialDetail | null>(null);
+const isLoading = ref(true);
+const errorMessage = ref("");
+
 const quantity = ref(1);
 const startDate = ref("");
 const endDate = ref("");
 const isRentalModalOpen = ref(false);
 const requestMessage = ref("");
+const isSubmitting = ref(false);
+const submitError = ref("");
 
-// TODO(API): 추후 id 기반 상세 API 호출로 대체. 현재는 mock 데이터 조회.
-const FALLBACK_MATERIAL: MaterialItem = {
-  id: "chair-rental",
-  tradeType: "rental",
-  image: "https://via.placeholder.com/1200x700?text=Rental+Item",
-  category: "가구",
-  condition: "최상",
-  title: "행사용 접이식 의자",
-  desc: "행사 현장에서 사용한 접이식 의자입니다. 가볍고 적재가 쉬워 단기 프로젝트에 적합합니다.",
-  location: "서울 마포구",
-  price: 25000,
-  priceLabel: "25,000원",
-  stock: 150,
-  stockLabel: "150개 보유",
-  carbon: "45kg CO2",
-  seller: "이벤트플러스",
-  rating: "4.9",
-  badgeLabel: "대여",
-  registeredAt: "2026-04-04",
-};
-
-const material = computed(() => {
-  const found = materials.find((item) => item.id === props.id) ?? FALLBACK_MATERIAL;
-  return { ...found, description: found.desc };
+onMounted(async () => {
+  try {
+    material.value = await materialsApi.detail(Number(props.id));
+  } catch (e) {
+    errorMessage.value = (e as Error).message;
+  } finally {
+    isLoading.value = false;
+  }
 });
 
-const maxStock = computed(() => (typeof material.value.stock === "number" ? material.value.stock : 150));
+const regionLabel = computed(() =>
+  material.value
+    ? regionOptions.find((r) => r.value === material.value!.region)?.label ?? material.value.region
+    : "—",
+);
+const conditionLabel = computed(() =>
+  material.value ? conditionLabelOf(material.value.materialCondition) : "—",
+);
+const priceLabel = computed(() =>
+  material.value?.price != null ? `${material.value.price.toLocaleString("ko-KR")}원` : "—",
+);
+
+const formatDate = (iso: string | null | undefined): string => {
+  if (!iso) return "—";
+  const date = new Date(iso);
+  return Number.isNaN(date.getTime()) ? iso : date.toLocaleDateString("ko-KR");
+};
+
+const maxStock = computed(() => material.value?.quantity ?? 1);
 
 const rentalDays = computed(() => {
   if (!startDate.value || !endDate.value) return 1;
@@ -52,11 +64,21 @@ const rentalDays = computed(() => {
 });
 
 const estimatedPrice = computed(() => {
-  const price = typeof material.value.price === "number" ? material.value.price : 0;
-  return `${(price * quantity.value * rentalDays.value).toLocaleString()}원`;
+  const price = material.value?.price ?? 0;
+  return `${(price * quantity.value * rentalDays.value).toLocaleString("ko-KR")}원`;
 });
 
-const estimatedCarbon = computed(() => `${(45 * quantity.value * rentalDays.value).toFixed(1)}kg CO₂`);
+const estimatedCarbon = computed(() => {
+  const perUnit = material.value?.carbonReductionKg ?? null;
+  if (perUnit == null) return "—";
+  return `${(perUnit * quantity.value).toLocaleString("ko-KR")}kg CO₂`;
+});
+
+const unitCarbon = computed(() => {
+  const v = material.value?.carbonReductionKg ?? null;
+  return v == null ? "—" : `${v.toLocaleString("ko-KR")}kg CO₂`;
+});
+
 const goBack = () => {
   if (window.history.state?.back) router.back();
   else router.push({ name: "marketplace" });
@@ -69,10 +91,45 @@ const decrementQuantity = () => {
 };
 const openRentalModal = () => {
   requestMessage.value = "";
+  submitError.value = "";
   isRentalModalOpen.value = true;
 };
 const closeRentalModal = () => {
+  if (isSubmitting.value) return;
   isRentalModalOpen.value = false;
+};
+
+const submitRentalRequest = async () => {
+  if (isSubmitting.value || !material.value) return;
+  if (!startDate.value || !endDate.value) {
+    submitError.value = "대여 시작일과 종료일을 선택해주세요.";
+    return;
+  }
+  if (new Date(endDate.value) < new Date(startDate.value)) {
+    submitError.value = "종료일은 시작일 이후여야 합니다.";
+    return;
+  }
+  if (!requestMessage.value.trim()) {
+    submitError.value = "요청 메시지를 입력해주세요.";
+    return;
+  }
+  submitError.value = "";
+  isSubmitting.value = true;
+  try {
+    await tradesApi.request({
+      materialId: material.value.id,
+      quantity: quantity.value,
+      requestMessage: requestMessage.value.trim(),
+      rentalStart: startDate.value,
+      rentalEnd: endDate.value,
+    });
+    isRentalModalOpen.value = false;
+    router.push({ name: "trade-status" });
+  } catch (e) {
+    submitError.value = (e as Error).message;
+  } finally {
+    isSubmitting.value = false;
+  }
 };
 </script>
 
@@ -89,46 +146,99 @@ const closeRentalModal = () => {
         </svg>
         뒤로 가기
       </button>
-      <div class="grid gap-6 lg:grid-cols-[1fr_384px]">
+
+      <p v-if="isLoading" class="rounded-md bg-[#eff6ff] px-3 py-2 text-sm text-[#1e40af]">
+        자재 정보를 불러오는 중입니다…
+      </p>
+      <p v-else-if="errorMessage" class="rounded-md bg-[#fef2f2] px-3 py-2 text-sm text-[#dc2626]" role="alert">
+        {{ errorMessage }}
+      </p>
+
+      <div v-else-if="material" class="grid gap-6 lg:grid-cols-[1fr_384px]">
         <section class="space-y-6">
           <div class="overflow-hidden rounded-[20px] border border-[#e5e7eb] bg-white shadow-sm">
-            <img :src="material.image" alt="대여 상품 이미지" class="h-[440px] w-full object-cover" />
+            <img v-if="material.imageUrl" :src="material.imageUrl" alt="대여 상품 이미지" class="h-[440px] w-full object-cover" />
+            <div v-else class="grid h-[440px] w-full place-items-center bg-[#f3f4f6] text-6xl text-[#cbd5e1]">📦</div>
           </div>
           <article class="rounded-[20px] border border-[#e5e7eb] bg-white p-6 shadow-sm">
-            <h1 class="text-[32px] font-bold tracking-[-0.03em]">{{ material.title }}</h1>
+            <div class="flex flex-wrap gap-2">
+              <span class="rounded-[8px] bg-[#8cc7c4]/20 px-2.5 py-1 text-xs font-medium text-[#2c687b]">{{ material.categoryName }}</span>
+              <span class="rounded-[8px] bg-[#f0fdf4] px-2.5 py-1 text-xs font-medium text-[#008236]">{{ conditionLabel }}</span>
+              <span class="rounded-[8px] bg-[#f3e8ff] px-2.5 py-1 text-xs font-medium text-[#8200db]">대여</span>
+            </div>
+            <h1 class="mt-3 text-[32px] font-bold tracking-[-0.03em]">{{ material.materialName }}</h1>
             <div class="mt-3 flex items-end gap-2">
-              <span class="text-[34px] font-bold text-[#db1a1a]">{{ material.price }}원</span>
+              <span class="text-[34px] font-bold text-[#db1a1a]">{{ priceLabel }}</span>
               <span class="pb-1 text-sm text-[#6a7282]">/ 1일</span>
             </div>
             <div class="mt-6 grid gap-4 rounded-[16px] bg-[#f9fafb] p-5 sm:grid-cols-3">
-              <div><p class="text-xs text-[#6a7282]">보유 수량</p><p class="mt-1 text-base font-semibold text-[#101828]">{{ material.stockLabel }}</p></div>
-              <div><p class="text-xs text-[#6a7282]">위치</p><p class="mt-1 text-base font-semibold text-[#101828]">{{ material.location }}</p></div>
-              <div><p class="text-xs text-[#6a7282]">등록일</p><p class="mt-1 text-base font-semibold text-[#101828]">{{ material.registeredAt }}</p></div>
+              <div><p class="text-xs text-[#6a7282]">보유 수량</p><p class="mt-1 text-base font-semibold text-[#101828]">{{ material.quantity }}개</p></div>
+              <div><p class="text-xs text-[#6a7282]">위치</p><p class="mt-1 text-base font-semibold text-[#101828]">{{ regionLabel }}</p></div>
+              <div><p class="text-xs text-[#6a7282]">등록일</p><p class="mt-1 text-base font-semibold text-[#101828]">{{ formatDate(material.createdAt) }}</p></div>
             </div>
-            <div class="mt-6"><h2 class="text-lg font-semibold">상세 설명</h2><p class="mt-3 text-sm text-[#475569]">{{ material.description }}</p></div>
+            <div class="mt-6"><h2 class="text-lg font-semibold">상세 설명</h2><p class="mt-3 whitespace-pre-line text-sm text-[#475569]">{{ material.description }}</p></div>
+
+            <div class="mt-6 border-t border-[#e5e7eb] pt-6">
+              <h2 class="text-lg font-semibold">ESG 효과</h2>
+              <div class="mt-4 rounded-[10px] border border-[#b9f8cf] bg-[#f0fdf4] p-4">
+                <div class="flex items-center gap-3">
+                  <div class="grid size-10 shrink-0 place-items-center rounded-[10px] bg-[#dcfce7]">
+                    <img src="/figma-icons/esg-leaf.svg" alt="" class="size-5 object-contain" />
+                  </div>
+                  <div>
+                    <p class="text-sm text-[#4a5565]">탄소 절감량</p>
+                    <p class="text-2xl font-bold text-[#008236]">{{ unitCarbon }}</p>
+                  </div>
+                </div>
+                <p class="mt-2 text-xs text-[#4a5565]">신규 자재 대비 탄소 배출 감소</p>
+              </div>
+            </div>
           </article>
         </section>
+
         <aside class="space-y-6">
           <article class="rounded-[16px] border border-[#e5e7eb] bg-white p-6 shadow-sm">
+            <div class="mb-4 flex items-center gap-3 border-b border-[#f3f4f6] pb-4">
+              <div class="grid size-10 place-items-center rounded-full bg-[#2c687b]/10 text-sm font-bold text-[#2c687b]">
+                {{ material.sellerName?.[0] ?? "?" }}
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-[#101828]">{{ material.sellerName }}</p>
+                <p class="text-xs text-[#6a7282]">{{ material.companyName }} · ★ {{ material.starRating ?? "—" }}</p>
+              </div>
+            </div>
             <h2 class="text-lg font-bold">대여 정보</h2>
             <div class="mt-5 space-y-4">
-              <div><label class="block text-sm font-medium text-[#1a1a1a]">수량</label><div class="mt-2 flex items-center gap-2"><button class="h-10 w-10 rounded-xl bg-[#f3f4f6]" @click="decrementQuantity">-</button><span class="min-w-[48px] text-center text-lg font-semibold">{{ quantity }}</span><button class="h-10 w-10 rounded-xl bg-[#f3f4f6]" @click="incrementQuantity">+</button></div></div>
-              <div><label class="block text-sm font-medium text-[#1a1a1a]">대여 시작일</label><input type="date" v-model="startDate" class="mt-2 h-11 w-full rounded-xl border border-[#d1d5dc] bg-white px-4 text-sm outline-none" /></div>
-              <div><label class="block text-sm font-medium text-[#1a1a1a]">대여 종료일</label><input type="date" v-model="endDate" class="mt-2 h-11 w-full rounded-xl border border-[#d1d5dc] bg-white px-4 text-sm outline-none" /></div>
+              <div>
+                <label class="block text-sm font-medium text-[#1a1a1a]">수량</label>
+                <div class="mt-2 flex items-center gap-2">
+                  <button type="button" class="h-10 w-10 rounded-xl bg-[#f3f4f6]" @click="decrementQuantity">-</button>
+                  <span class="min-w-[48px] text-center text-lg font-semibold">{{ quantity }}</span>
+                  <button type="button" class="h-10 w-10 rounded-xl bg-[#f3f4f6]" @click="incrementQuantity">+</button>
+                </div>
+              </div>
+              <div><label class="block text-sm font-medium text-[#1a1a1a]">대여 시작일</label><input v-model="startDate" type="date" class="mt-2 h-11 w-full rounded-xl border border-[#d1d5dc] bg-white px-4 text-sm outline-none" /></div>
+              <div><label class="block text-sm font-medium text-[#1a1a1a]">대여 종료일</label><input v-model="endDate" type="date" class="mt-2 h-11 w-full rounded-xl border border-[#d1d5dc] bg-white px-4 text-sm outline-none" /></div>
             </div>
-            <div class="mt-6 rounded-[16px] bg-[#f9fafb] p-4"><p class="text-sm text-[#6b7280]">예상 대여 기간</p><p class="mt-2 text-2xl font-bold text-[#2c687b]">{{ rentalDays }}일</p><p class="mt-3 text-sm text-[#475569]">예상 결제금액: {{ estimatedPrice }}</p><p class="text-sm text-[#475569]">탄소절감 예상: {{ estimatedCarbon }}</p></div>
-            <button class="mt-6 w-full rounded-xl bg-[#2c687b] px-4 py-3 text-white" @click="openRentalModal">대여 요청</button>
+            <div class="mt-6 rounded-[16px] bg-[#f9fafb] p-4">
+              <p class="text-sm text-[#6b7280]">예상 대여 기간</p>
+              <p class="mt-2 text-2xl font-bold text-[#2c687b]">{{ rentalDays }}일</p>
+              <p class="mt-3 text-sm text-[#475569]">예상 결제금액: {{ estimatedPrice }}</p>
+              <p class="text-sm text-[#475569]">탄소절감 예상: {{ estimatedCarbon }}</p>
+            </div>
+            <button type="button" class="mt-6 w-full rounded-xl bg-[#2c687b] px-4 py-3 text-white transition hover:bg-[#25596a]" @click="openRentalModal">대여 요청</button>
           </article>
         </aside>
       </div>
     </div>
 
-    <div v-if="isRentalModalOpen" class="fixed inset-0 z-[70] flex items-center justify-center bg-[#101828]/45 px-4 py-8 backdrop-blur-[2px]" @click.self="closeRentalModal">
+    <!-- 대여 요청 모달 -->
+    <div v-if="isRentalModalOpen && material" class="fixed inset-0 z-[70] flex items-center justify-center bg-[#101828]/45 px-4 py-8 backdrop-blur-[2px]" @click.self="closeRentalModal">
       <div class="max-h-[90vh] w-full max-w-[480px] overflow-y-auto rounded-[20px] border border-[#ece3e3] bg-[#fff8f8] p-6 shadow-[0_24px_80px_rgba(15,23,42,0.22)]">
         <div class="flex items-start justify-between gap-4">
           <div>
             <h2 class="text-xl font-bold tracking-[-0.02em] text-[#111827]">대여 요청</h2>
-            <p class="mt-1 text-sm font-medium text-[#64748b]">{{ material.title }}</p>
+            <p class="mt-1 text-sm font-medium text-[#64748b]">{{ material.materialName }}</p>
           </div>
           <button type="button" class="grid size-8 place-items-center rounded-full text-[#6b7280] transition hover:bg-white" @click="closeRentalModal">
             <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -140,11 +250,11 @@ const closeRentalModal = () => {
         <section class="mt-5 rounded-[14px] bg-white px-4 py-4 shadow-[0_8px_30px_rgba(15,23,42,0.04)]">
           <div class="flex items-center justify-between gap-4">
             <span class="text-sm text-[#475569]">판매자</span>
-            <span class="text-sm font-bold text-[#111827]">{{ material.seller ?? "이벤트플러스" }}</span>
+            <span class="text-sm font-bold text-[#111827]">{{ material.sellerName }}</span>
           </div>
           <div class="mt-3 flex items-center justify-between gap-4">
             <span class="text-sm text-[#475569]">단가</span>
-            <span class="text-base font-bold text-[#ef4444]">{{ material.price.toLocaleString() }}원 / 개 / 일</span>
+            <span class="text-base font-bold text-[#ef4444]">{{ priceLabel }} / 개 / 일</span>
           </div>
         </section>
 
@@ -178,7 +288,7 @@ const closeRentalModal = () => {
 
         <section class="mt-5 rounded-[14px] bg-white px-4 py-4 shadow-[0_8px_30px_rgba(15,23,42,0.04)]">
           <div class="flex items-center justify-between gap-4">
-            <span class="text-sm text-[#475569]">예상 금액</span>
+            <span class="text-sm text-[#475569]">예상 금액 ({{ rentalDays }}일)</span>
             <span class="text-2xl font-bold tracking-[-0.02em] text-[#ef4444]">{{ estimatedPrice }}</span>
           </div>
           <div class="mt-3 flex items-center justify-between gap-4">
@@ -199,15 +309,19 @@ const closeRentalModal = () => {
           <p class="mt-2 text-xs text-[#94a3b8]">구체적인 요청 사항을 작성하면 빠른 답변을 받을 수 있습니다</p>
         </section>
 
+        <p v-if="submitError" class="mt-3 rounded-md bg-[#fef2f2] px-3 py-2 text-sm text-[#dc2626]" role="alert">
+          {{ submitError }}
+        </p>
+
         <div class="mt-6 grid gap-3 sm:grid-cols-2">
-          <button type="button" class="h-11 rounded-[12px] border border-[#e0d7d7] bg-white text-sm font-semibold text-[#111827] transition hover:border-[#c9bec0]" @click="closeRentalModal">
+          <button type="button" :disabled="isSubmitting" class="h-11 rounded-[12px] border border-[#e0d7d7] bg-white text-sm font-semibold text-[#111827] transition hover:border-[#c9bec0] disabled:opacity-60" @click="closeRentalModal">
             취소
           </button>
-          <button type="button" class="flex h-11 items-center justify-center gap-2 rounded-[12px] bg-[#ef4444] text-sm font-semibold text-white transition hover:bg-[#dc2626]" @click="closeRentalModal">
+          <button type="button" :disabled="isSubmitting" class="flex h-11 items-center justify-center gap-2 rounded-[12px] bg-[#ef4444] text-sm font-semibold text-white transition hover:bg-[#dc2626] disabled:cursor-not-allowed disabled:opacity-60" @click="submitRentalRequest">
             <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M8 2v4M16 2v4M3.5 9.5h17M5 6h14a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
-            대여 요청
+            {{ isSubmitting ? "요청 중..." : "대여 요청" }}
           </button>
         </div>
       </div>
