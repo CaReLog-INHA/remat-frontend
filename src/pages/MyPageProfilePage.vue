@@ -8,6 +8,7 @@ import { homeAssets } from "@/data/home";
 import { myPageNavItems } from "@/data/mypage";
 import { regionOptions } from "@/data/regions";
 import { useMyPageOverview } from "@/composables/useMyPageOverview";
+import { formatCarbonKg } from "@/utils/format";
 
 const { overview, isLoading, errorMessage, profile, reviewCount, summaryCards } =
   useMyPageOverview();
@@ -96,7 +97,7 @@ const esgProgressPercent = computed(() => {
           <div class="mt-5 rounded-[12px] bg-white p-5">
             <p class="text-sm text-[#4a5565]">총 탄소 절감량</p>
             <p class="mt-3 text-[48px] font-bold leading-none tracking-[-0.05em] text-[#00a63e]">
-              {{ overview?.esgContribution?.totalCarbonKg ?? "—" }}kg CO2
+              {{ formatCarbonKg(overview?.esgContribution?.totalCarbonKg) }}kg CO2
             </p>
             <p class="mt-2 text-sm text-[#6a7282]">
               나무 {{ overview?.esgContribution?.treeCount ?? "—" }}그루를 심은 것과 같은 효과

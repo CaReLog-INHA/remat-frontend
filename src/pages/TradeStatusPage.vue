@@ -5,6 +5,7 @@ import TradeHistoryPanel from "@/components/trade-status/TradeHistoryPanel.vue";
 import TradeMaterialsPanel from "@/components/trade-status/TradeMaterialsPanel.vue";
 import TradeRequestsPanel from "@/components/trade-status/TradeRequestsPanel.vue";
 import { useMyPageOverview } from "@/composables/useMyPageOverview";
+import { formatCarbonKg } from "@/utils/format";
 
 type TradeTab = "materials" | "requests" | "history";
 
@@ -58,7 +59,7 @@ const tabs: ReadonlyArray<{ key: TradeTab; label: string; icon: "box" | "trend" 
             <div class="grid size-12 place-items-center rounded-[10px] bg-[#f0fdf4]">
               <img src="/figma-icons/stat-carbon.svg" alt="" class="size-6 object-contain" />
             </div>
-            <p class="mt-3 text-3xl font-bold">{{ totalCarbonKg != null ? `${totalCarbonKg}kg` : "—" }}</p>
+            <p class="mt-3 text-3xl font-bold">{{ totalCarbonKg != null ? `${formatCarbonKg(totalCarbonKg)}kg` : "—" }}</p>
             <p class="mt-1 text-sm text-[#4a5565]">탄소 절감</p>
           </article>
           <article class="rounded-[14px] border-l-4 border-[#2b7fff] bg-white p-6 shadow-sm">
@@ -110,7 +111,7 @@ const tabs: ReadonlyArray<{ key: TradeTab; label: string; icon: "box" | "trend" 
           <div class="mt-4 grid gap-4 md:grid-cols-2">
             <div class="rounded-[8px] bg-white p-4">
               <p class="text-sm text-[#4a5565]">총 탄소 절감량</p>
-              <p class="mt-1 text-3xl font-bold text-[#00a63e]">{{ totalCarbonKg != null ? `${totalCarbonKg}kg` : "—" }}</p>
+              <p class="mt-1 text-3xl font-bold text-[#00a63e]">{{ totalCarbonKg != null ? `${formatCarbonKg(totalCarbonKg)}kg` : "—" }}</p>
               <p class="mt-1 text-xs text-[#6a7282]">나무 {{ treeCount ?? "—" }}그루 식재 효과</p>
             </div>
             <div class="rounded-[8px] bg-white p-4">
