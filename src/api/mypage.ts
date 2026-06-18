@@ -118,6 +118,8 @@ export const myPageApi = {
   badges: (): Promise<BadgeSection> => http.get<BadgeSection>("/mypage/badges"),
   esg: (): Promise<ESGContribution> => http.get<ESGContribution>("/mypage/esg"),
   esgReport: (): Promise<ESGReport> => http.get<ESGReport>("/mypage/esg-report"),
+  regenerateEsgReport: (payload: { periodStart: string; periodEnd: string }): Promise<void> =>
+    http.post<void>("/esg-reports", payload),
   activities: (): Promise<RecentActivities> => http.get<RecentActivities>("/mypage/activities"),
   sellingMaterials: (): Promise<SellingMaterial[]> => http.get<SellingMaterial[]>("/mypage/materials"),
 };
