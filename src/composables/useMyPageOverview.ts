@@ -1,6 +1,7 @@
 import { computed, onMounted, ref } from "vue";
 import { myPageApi, type MyPageOverview } from "@/api/mypage";
 import type { SummaryCard } from "@/components/mypage/MyPageSummaryCards.vue";
+import { formatCarbonKg } from "@/utils/format";
 
 /**
  * 마이페이지 통합 조회(/mypage)를 onMounted 시점에 가져오고,
@@ -43,7 +44,7 @@ export const useMyPageOverview = () => {
       },
       {
         label: "탄소 절감",
-        value: esg?.totalCarbonKg != null ? `${esg.totalCarbonKg}kg` : "—",
+        value: esg?.totalCarbonKg != null ? `${formatCarbonKg(esg.totalCarbonKg)}kg` : "—",
         iconSrc: "/figma-icons/stat-carbon.svg",
         tint: "bg-[#dcfce7]",
       },

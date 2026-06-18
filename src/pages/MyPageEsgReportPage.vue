@@ -1,13 +1,35 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
-import MyPageTabs from "@/components/mypage/MyPageTabs.vue";
+import EsgPeriodModal from "@/components/mypage/EsgPeriodModal.vue";
 import { myPageNavItems } from "@/data/mypage";
 import { myPageApi, type ESGReport } from "@/api/mypage";
+import { formatCarbonKg } from "@/utils/format";
 
 const report = ref<ESGReport | null>(null);
 const isLoading = ref(true);
 const errorMessage = ref("");
+
+const isPeriodModalOpen = ref(false);
+const isRegenerating = ref(false);
+
+const openPeriodModal = () => {
+  isPeriodModalOpen.value = true;
+};
+
+const handleRegenerate = async (payload: { periodStart: string; periodEnd: string }) => {
+  isRegenerating.value = true;
+  errorMessage.value = "";
+  try {
+    await myPageApi.regenerateEsgReport(payload);
+    report.value = await myPageApi.esgReport();
+    isPeriodModalOpen.value = false;
+  } catch (e) {
+    errorMessage.value = (e as Error).message;
+  } finally {
+    isRegenerating.value = false;
+  }
+};
 
 onMounted(async () => {
   try {
@@ -44,7 +66,7 @@ const reportSummary = computed(() => {
   return [
     {
       label: "총 탄소 절감",
-      value: s?.totalCarbonKg != null ? `${s.totalCarbonKg}kg` : "—",
+      value: s?.totalCarbonKg != null ? `${formatCarbonKg(s.totalCarbonKg)}kg` : "—",
       detail: "재사용 자재 거래로 절감된 배출량",
       bg: "bg-[#ebf8f4]",
       iconPath: "M12 2v14M5 13l7 7 7-7",
@@ -84,9 +106,15 @@ const maxMonthlySavings = computed(() => {
   return max > 0 ? max : 1;
 });
 
+// 막대 길이 기준: (해당 월 / 가장 큰 달) × 100%. 가장 큰 달이 트랙을 가득 채우고, 0인 달은 막대를 그리지 않는다.
+const barWidthPercent = (value: number): number => {
+  if (value <= 0) return 0;
+  return (value / maxMonthlySavings.value) * 100;
+};
+
 const totalCarbonSavings = computed(() => {
   const s = report.value?.summary?.totalCarbonKg;
-  return s != null ? `${s}kg CO2` : "—";
+  return s != null ? `${formatCarbonKg(s)}kg CO2` : "—";
 });
 </script>
 
@@ -102,19 +130,33 @@ const totalCarbonSavings = computed(() => {
                 <h1 class="mt-4 text-4xl font-bold tracking-[-0.03em] text-white sm:text-5xl">ESG 탄소 감축 리포트</h1>
                 <p class="mt-4 max-w-3xl text-base leading-7 text-[#d8eef1]">기업의 탄소 절감 성과를 확인하고 리포트를 내려받으세요.</p>
               </div>
-              <button
-                type="button"
-                disabled
-                class="inline-flex h-12 items-center gap-2 rounded-[18px] bg-[#144a5b] px-5 text-sm font-semibold text-white shadow-lg opacity-60"
-                title="추후 제공 예정"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
-                다운로드
-              </button>
+              <div class="flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  class="inline-flex h-12 items-center gap-2 rounded-[18px] bg-white/15 px-5 text-sm font-semibold text-white shadow-lg ring-1 ring-inset ring-white/30 transition hover:bg-white/25"
+                  title="최신 거래를 반영해 리포트를 다시 생성합니다"
+                  @click="openPeriodModal"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+                    <polyline points="21 3 21 9 15 9" />
+                  </svg>
+                  리포트 갱신
+                </button>
+                <button
+                  type="button"
+                  disabled
+                  class="inline-flex h-12 items-center gap-2 rounded-[18px] bg-[#144a5b] px-5 text-sm font-semibold text-white shadow-lg opacity-60"
+                  title="추후 제공 예정"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  다운로드
+                </button>
+              </div>
             </div>
           </div>
 
@@ -169,12 +211,8 @@ const totalCarbonSavings = computed(() => {
       </div>
     </section>
 
-    <section class="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
-      <div class="rounded-[20px] border border-[#e5e7eb] bg-white p-6 shadow-[0_1px_1.5px_rgba(0,0,0,0.08),0_1px_1px_rgba(0,0,0,0.06)]">
-        <MyPageTabs current-page="my-page-esg-report" />
-      </div>
-
-      <div class="mt-6 grid gap-6 xl:grid-cols-[2fr_1fr]">
+    <section class="mx-auto max-w-7xl px-4 pb-12 pt-10 sm:px-6 lg:px-8">
+      <div class="grid gap-6 xl:grid-cols-[2fr_1fr]">
         <section class="rounded-[20px] border border-[#e5e7eb] bg-white p-6 shadow-sm">
           <div class="flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center gap-3 text-[#101828]">
@@ -200,11 +238,12 @@ const totalCarbonSavings = computed(() => {
             <div v-for="bar in monthlySavings" :key="bar.label" class="space-y-2">
               <div class="flex items-center justify-between text-sm text-[#475569]">
                 <span>{{ bar.label }}</span>
-                <span>{{ bar.value }}kg CO2</span>
+                <span>{{ formatCarbonKg(bar.value) }}kg CO2</span>
               </div>
               <div class="h-3 rounded-full bg-[#eaeded]">
                 <div
-                  :style="{ width: `${Math.max(12, (bar.value / maxMonthlySavings) * 88)}%` }"
+                  v-if="bar.value > 0"
+                  :style="{ width: `${barWidthPercent(bar.value)}%` }"
                   class="h-3 rounded-full bg-gradient-to-r from-[#34d399] to-[#2c687b]"
                 />
               </div>
@@ -247,7 +286,7 @@ const totalCarbonSavings = computed(() => {
                   <td class="py-4">{{ formatDate(record.tradeDate) }}</td>
                   <td class="py-4">{{ record.materialName }}</td>
                   <td class="py-4">{{ record.quantity }}</td>
-                  <td class="py-4 font-semibold text-[#008236]">{{ record.carbonKg }}kg CO2</td>
+                  <td class="py-4 font-semibold text-[#008236]">{{ formatCarbonKg(record.carbonKg) }}kg CO2</td>
                 </tr>
               </tbody>
               <tfoot v-if="(report?.reportDetails?.length ?? 0) > 0">
@@ -278,10 +317,10 @@ const totalCarbonSavings = computed(() => {
           <div class="rounded-[24px] bg-white p-5 shadow-sm ring-1 ring-[#d9f9e8]">
             <p class="text-sm font-medium text-[#475569]">탄소 배출 감소 효과</p>
             <p class="mt-4 text-3xl font-bold text-[#047857]">
-              {{ report?.summary?.totalCarbonKg ?? "—" }}kg CO2
+              {{ formatCarbonKg(report?.summary?.totalCarbonKg) }}kg CO2
             </p>
             <p class="mt-2 text-sm leading-6 text-[#475569]">
-              신규 자재 구매 시 발생하는 탄소 배출량 대비 {{ report?.summary?.totalCarbonKg ?? "—" }}kg 감소
+              신규 자재 구매 시 발생하는 탄소 배출량 대비 {{ formatCarbonKg(report?.summary?.totalCarbonKg) }}kg 감소
             </p>
           </div>
           <div class="rounded-[24px] bg-white p-5 shadow-sm ring-1 ring-[#ede9fe]">
@@ -296,10 +335,19 @@ const totalCarbonSavings = computed(() => {
         <p class="mt-6 rounded-[20px] bg-[#f8fffa] p-5 text-sm leading-6 text-[#334155] shadow-sm">
           <span class="font-semibold text-[#047857]">{{ report?.companyName ?? "—" }}</span>
           는 ReMat 플랫폼을 통한 자재 재사용으로
-          <span class="font-semibold text-[#047857]">{{ report?.summary?.totalCarbonKg ?? "—" }}kg</span>의 탄소 배출을 절감하였으며, 이는
+          <span class="font-semibold text-[#047857]">{{ formatCarbonKg(report?.summary?.totalCarbonKg) }}kg</span>의 탄소 배출을 절감하였으며, 이는
           <span class="font-semibold text-[#065f46]">나무 {{ report?.summary?.treeCount ?? "—" }}그루</span>를 심는 것과 동일한 환경 보호 효과입니다. 순환 경제 실현을 통해 ESG 경영에 기여하고 있습니다.
         </p>
       </div>
     </section>
+
+    <EsgPeriodModal
+      v-if="isPeriodModalOpen"
+      :initial-start="report?.periodStart"
+      :initial-end="report?.periodEnd"
+      :submitting="isRegenerating"
+      @close="isPeriodModalOpen = false"
+      @submit="handleRegenerate"
+    />
   </DefaultLayout>
 </template>
