@@ -33,6 +33,7 @@ export const aiApi = {
     form.append("file", file);
     const res = await api.post<ApiResponse<AnalysisResult>>("/ai/analyze", form, {
       headers: { "Content-Type": "multipart/form-data" },
+      timeout: 120000, 
     });
     return res.data.body;
   },
